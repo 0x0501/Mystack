@@ -142,6 +142,25 @@ bun run auth:generate   # after changing plugins in src/lib/auth.ts
 | `/dashboard`, `/dashboard/account` | User shell |
 | `/admin/users`, `/admin/audit`, `/admin/oauth-apps` | Admin console |
 
+### Navigation and session caching
+
+SSR handles the initial request; subsequent navigation runs `beforeLoad` and loaders in the browser. The root guard uses a per-router TanStack Query session cache (`sessionQueryOptions`, 30 seconds), so intent preloads and navigation share requests. Expired or invalidated sessions are checked before child guards run. Each SSR request gets a separate QueryClient, and SSR query data is hydrated into the browser cache.
+
+Query results stay fresh for 30 seconds by default, avoiding immediate duplicate fetches after SSR, preloading, or a loader. Override `staleTime` per query when needed. Slow loaders show `RoutePending` after 150ms with no forced minimum delay; `NavigationProgress` covers waits in `beforeLoad` before the next page's pending boundary is available. Both use the localized `common_loading` message and replaceable presentation.
+
+Better Auth's production cookie cache lasts **360 seconds (6 minutes)**; it is disabled in dev. This saves server database reads and is separate from the browser query cache. Server authorization and sensitive-operation checks remain in the server functions.
+
+After changing authentication state without a full page reload, invalidate the session query before rerunning route guards:
+
+```tsx
+import { sessionQueryOptions } from "@/integrations/better-auth/session-query";
+
+await queryClient.invalidateQueries({ queryKey: sessionQueryOptions.queryKey });
+await router.invalidate();
+```
+
+The account page does this after profile/security changes. Sign-in and sign-out use full page navigation, which starts a new cache.
+
 ## Payments (optional)
 
 Stripe / Creem / NowPayments adapters map to a platform **Purchase** row and call the **purchase-paid hook** once. No wallet or subscription product. Disable rails server-side via payment method toggles (admin tools strip — not a fourth nav item).

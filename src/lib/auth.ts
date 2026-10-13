@@ -91,7 +91,7 @@ export function createAuth(db: Database) {
 		session: {
 			cookieCache: {
 				enabled: !import.meta.env.DEV,
-				maxAge: 60,
+				maxAge: 360,
 			},
 		},
 		emailAndPassword: {

@@ -1,4 +1,5 @@
-import { createRootRouteWithContext } from "@tanstack/react-router";
+import { createRootRouteWithContext, Outlet } from "@tanstack/react-router";
+import { NavigationProgress } from "#/components/root/navigation-progress.tsx";
 import { NotFound } from "#/components/root/not-found.tsx";
 import { RootDocument } from "#/components/root/root-document.tsx";
 import { RootError } from "#/components/root/root-error.tsx";
@@ -13,17 +14,19 @@ import {
 	THEME_COLOR_LIGHT,
 } from "#/lib/site.ts";
 import { THEME_INIT_SCRIPT } from "#/lib/theme.ts";
+import { sessionQueryOptions } from "@/integrations/better-auth/session-query";
 import { getLocale } from "@/paraglide/runtime";
-import { getSession } from "@/server/auth";
 import appCss from "../styles.css?url";
 
 const OG_IMAGE = abs("/logo512.png");
 
 export const Route = createRootRouteWithContext<MyRouterContext>()({
-	// One session read per request, inherited by every match. Child routes may
-	// read `context.session` rather than call getSession again. Privileged
-	// mutations that must not trust the cookie cache still re-read the DB.
-	beforeLoad: async () => ({ session: await getSession() }),
+	// Each SSR request has its own QueryClient. In the browser, navigation and
+	// intent preloads share the session query instead of serializing an RPC
+	// ahead of every page loader. fetchQuery still awaits stale-session checks.
+	beforeLoad: async ({ context }) => ({
+		session: await context.queryClient.fetchQuery(sessionQueryOptions),
+	}),
 	head: () => {
 		const locale = getLocale();
 		return {
@@ -158,5 +161,15 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
 		<RootError error={error} reset={reset} />
 	),
 	notFoundComponent: NotFound,
+	component: RootContent,
 	shellComponent: RootDocument,
 });
+
+function RootContent() {
+	return (
+		<>
+			<NavigationProgress />
+			<Outlet />
+		</>
+	);
+}
