@@ -28,6 +28,9 @@ export function getContext(): MyRouterContext {
 	const queryClient = new QueryClient({
 		defaultOptions: {
 			queries: {
+				// Reuse SSR/loader/preload results on mount rather than immediately
+				// repeating the same server function. Pages can override freshness.
+				staleTime: 30_000,
 				// A 4xx is a refusal, not a flake: asking again gets the same
 				// answer, and for a 401 the default three retries held the user
 				// on a dead page through ~7s of backoff before the redirect

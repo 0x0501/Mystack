@@ -6,6 +6,7 @@ import {
 	defaultParseSearch,
 } from "@tanstack/react-router";
 import { setupRouterSsrQueryIntegration } from "@tanstack/react-router-ssr-query";
+import { RoutePending } from "./components/root/pending";
 import { getContext } from "./integrations/tanstack-query/root-provider";
 import { deLocalizeUrl, localizeUrl } from "./paraglide/runtime";
 import { routeTree } from "./routeTree.gen";
@@ -20,6 +21,10 @@ export function getRouter() {
 		scrollRestoration: true,
 		defaultPreload: "intent",
 		defaultPreloadStaleTime: 0,
+		// Slow server functions must provide feedback after the URL changes.
+		defaultPendingComponent: RoutePending,
+		defaultPendingMs: 150,
+		defaultPendingMinMs: 0,
 		// Serve both slash forms without 307 so Paraglide trailing-slash
 		// urlPatterns and hosts that append `/` stay same-locale.
 		trailingSlash: "preserve",

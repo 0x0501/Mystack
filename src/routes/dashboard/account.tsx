@@ -1,7 +1,7 @@
 import { Select } from "@base-ui/react/select";
 import { Tabs } from "@base-ui/react/tabs";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useRouter } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import {
 	buttonClass,
@@ -11,6 +11,7 @@ import {
 	inputClass,
 	mutedTextClass,
 } from "@/components/shells";
+import { sessionQueryOptions } from "@/integrations/better-auth/session-query";
 import { authClient } from "@/lib/auth-client";
 import * as m from "@/paraglide/messages";
 import {
@@ -44,6 +45,7 @@ function AccountPage() {
 	// `/dashboard` narrowed `session` to signed-in for this whole subtree.
 	const { session } = Route.useRouteContext();
 	const qc = useQueryClient();
+	const router = useRouter();
 	const overview = useQuery(overviewQuery);
 
 	const sessionLocale =
@@ -59,6 +61,9 @@ function AccountPage() {
 
 	const invalidate = () => {
 		void qc.invalidateQueries({ queryKey: SECURITY_OVERVIEW_KEY });
+		void qc
+			.invalidateQueries({ queryKey: sessionQueryOptions.queryKey })
+			.then(() => router.invalidate());
 	};
 
 	async function saveProfile(e: React.FormEvent) {
