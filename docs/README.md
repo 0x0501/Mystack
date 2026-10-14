@@ -7,8 +7,10 @@ New application users start with Mystack. Contributor guides explain how the CLI
 | [`getting-started.md`](./getting-started.md) | Install Mystack, select configuration, create and run a project |
 | [`project-guide.md`](./project-guide.md) | Develop and deploy a generated application; bundled in generated projects |
 | [`contributing.md`](./contributing.md) | Maintain the generator and package CLI releases |
+| [`publishing.md`](./publishing.md) | Configure the personal npm account and publish release tags with GitHub Actions |
 | [`reference-template.md`](./reference-template.md) | Maintainers' setup for the root PostgreSQL / Workers reference application |
 | [`research/tanstack-cli-generation.md`](./research/tanstack-cli-generation.md) | Source-backed comparison with TanStack CLI composition |
+| [`research/npm-publishing.md`](./research/npm-publishing.md) | Official package naming, Bunx and trusted publishing requirements |
 | [`../DESIGN.md`](../DESIGN.md) | Headless design, styling ownership, customization, motion, references |
 | [`../CONTEXT.md`](../CONTEXT.md) | Ubiquitous language (glossary + invariants) |
 | [`adr/`](./adr/) | Architectural decision records |

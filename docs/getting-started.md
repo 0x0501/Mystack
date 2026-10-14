@@ -2,23 +2,23 @@
 
 Every new application starts with `mystack create`. The starter repository is the source for maintainers; you work in the generated application and follow its README for the configuration you selected.
 
-## Install the CLI
+## Run the CLI
 
 You need Node.js 22.12+ to run Mystack and Bun to install and run generated applications. PostgreSQL local development also needs Docker. Cloudflare deployments need a Cloudflare account; local Bun SQLite and libSQL development need no cloud database account.
 
-The public `@mystack/cli` npm package is not available yet. Obtain the packaged CLI tarball from a maintainer and install it:
+Run the public `@0x0501/mystack` package through Bunx:
 
 ```sh
-npm install --global ./mystack-cli-0.1.0.tgz
-mystack --help
+bunx @0x0501/mystack@latest
+bunx @0x0501/mystack@latest --help
 ```
 
-The tarball bundles the template and configuration adapters. Creating a project does not fetch a Git branch or need a starter checkout. Maintainers can build the release using [contributing.md](./contributing.md#package-a-cli-release).
+Bunx installs and runs the CLI without a global installation. The package bundles its template and configuration adapters. Creating a project does not fetch a Git branch or need a starter checkout. The package is owned by the personal npm account `0x0501`; maintainer setup is covered in [publishing.md](./publishing.md).
 
 ## Use the wizard
 
 ```sh
-mystack create my-app
+bunx @0x0501/mystack@latest create my-app
 ```
 
 Choose a database, deployment runtime, email transport and payment providers. Use the arrow keys to navigate, Space to toggle payment providers and Enter to confirm. An empty payment selection means none. Review the configuration summary before creation. Ctrl-C or Escape cancels configuration.
@@ -41,9 +41,9 @@ Cloudflare Email requires `cloudflare`; use Resend for Nitro or Bun. Only Postgr
 `--yes` skips prompts. Specify all four categories to make your choice explicit. Without a category flag, Mystack chooses its default if compatible, otherwise the first compatible choice. Default payments are Stripe; pass `--payments none` to omit payments. Flags use the wizard's compatibility rules.
 
 ```sh
-mystack create local-app --yes --database bun-sqlite --deployment bun --email resend --payments none
-mystack create workers-app --yes --database d1 --deployment cloudflare --email resend --payments stripe,polar
-mystack create server-app --yes --database pg --deployment nitro --email resend --payments stripe
+bunx @0x0501/mystack@latest create local-app --yes --database bun-sqlite --deployment bun --email resend --payments none
+bunx @0x0501/mystack@latest create workers-app --yes --database d1 --deployment cloudflare --email resend --payments stripe,polar
+bunx @0x0501/mystack@latest create server-app --yes --database pg --deployment nitro --email resend --payments stripe
 ```
 
 Add `--no-install` to generate files without running `bun install`. If installation fails, the generated application is retained; enter its directory and retry `bun install`.

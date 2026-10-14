@@ -6,22 +6,27 @@ Create a configured TanStack Start application with **Mystack**. Projects includ
 
 ## Create your project
 
-Install Node.js 22.12+ and [Bun](https://bun.sh). Install the CLI release tarball provided by a maintainer, then run the wizard:
+Install Node.js 22.12+ and [Bun](https://bun.sh). Run the CLI from npm to open the wizard:
 
 ```sh
-npm install --global ./mystack-cli-0.1.0.tgz
-mystack create my-app
+bunx @0x0501/mystack
+```
+
+To supply a project name:
+
+```sh
+bunx @0x0501/mystack@latest create my-app
 cd my-app
 ```
 
-The public npm package is not available yet. Until it is published, use a packaged CLI release. Maintainers build that artifact using the [contributor guide](./docs/contributing.md#package-a-cli-release).
+Mystack is published under the personal npm account `0x0501`. Maintainers configure the first release using the [publishing guide](./docs/publishing.md); subsequent `v*` tags publish through GitHub Actions.
 
 Follow the generated `README.md` to configure `.env`, apply migrations and start the app. Mystack installs dependencies unless you decline in the wizard or pass `--no-install`.
 
 For a local Bun application without cloud database credentials:
 
 ```sh
-mystack create my-app --yes --database bun-sqlite --deployment bun --email resend --payments none
+bunx @0x0501/mystack@latest create my-app --yes --database bun-sqlite --deployment bun --email resend --payments none
 cd my-app
 cp .env.example .env
 bun run db:migrate
@@ -60,6 +65,7 @@ The root application is the canonical template source. See [ADR 0012](./docs/adr
 - [Getting started](./docs/getting-started.md) — install Mystack and create a project
 - [Project guide](./docs/project-guide.md) — work inside a generated project; also bundled with the CLI
 - [Contributing](./docs/contributing.md) — maintain the template, adapters and CLI release
+- [Publishing](./docs/publishing.md) — personal npm account setup and automatic tag releases
 - [Reference template](./docs/reference-template.md) — maintainers' PostgreSQL / Workers setup
 - [Design](./DESIGN.md) — Headless presentation and customization
 - [Context](./CONTEXT.md) and [documentation index](./docs/README.md) — terminology and architecture

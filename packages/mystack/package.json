@@ -1,14 +1,23 @@
 {
-	"name": "@mystack/cli",
+	"name": "@0x0501/mystack",
 	"version": "0.1.0",
 	"description": "Create a configured TanStack Start application",
 	"license": "MIT",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/0x0501/tanstack-starter.git",
+		"directory": "packages/mystack"
+	},
+	"homepage": "https://github.com/0x0501/tanstack-starter/tree/main/packages/mystack#readme",
+	"bugs": {
+		"url": "https://github.com/0x0501/tanstack-starter/issues"
+	},
 	"type": "module",
 	"engines": {
 		"node": ">=22.12.0"
 	},
 	"bin": {
-		"mystack": "./src/cli.mjs"
+		"mystack": "src/cli.mjs"
 	},
 	"files": ["src", "template", "assets", "README.md", "LICENSE"],
 	"scripts": {
@@ -24,6 +33,7 @@
 		"@tanstack/router-generator": "1.167.38"
 	},
 	"publishConfig": {
-		"access": "public"
+		"access": "public",
+		"registry": "https://registry.npmjs.org"
 	}
 }

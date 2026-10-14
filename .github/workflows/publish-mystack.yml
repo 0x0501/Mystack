@@ -1,0 +1,72 @@
+name: Publish Mystack
+
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: mystack-npm-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    outputs:
+      dist-tag: ${{ steps.version.outputs.dist-tag }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          package-manager-cache: false
+      - name: Require a release commit on main
+        run: git merge-base --is-ancestor "$GITHUB_SHA" origin/main
+      - name: Match the release tag to the package version
+        id: version
+        env:
+          RELEASE_TAG: ${{ github.ref_name }}
+        run: |
+          node --input-type=module <<'NODE'
+          import { appendFileSync, readFileSync } from "node:fs";
+          const pkg = JSON.parse(readFileSync("packages/mystack/package.json", "utf8"));
+          if (pkg.name !== "@0x0501/mystack") {
+            throw new Error("Unexpected npm package name.");
+          }
+          if (process.env.RELEASE_TAG !== `v${pkg.version}`) {
+            throw new Error(`Tag must match package version: v${pkg.version}`);
+          }
+          const distTag = pkg.version.split("+")[0].includes("-") ? "next" : "latest";
+          appendFileSync(process.env.GITHUB_OUTPUT, `dist-tag=${distTag}\n`);
+          NODE
+
+  checks:
+    needs: release
+    uses: ./.github/workflows/ci.yml
+
+  publish:
+    needs: [release, checks]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@v7
+      - uses: oven-sh/setup-bun@v2
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          registry-url: https://registry.npmjs.org
+          package-manager-cache: false
+      - name: Install npm with trusted publishing support
+        run: npm install --global npm@11
+      - run: bun install --cwd packages/mystack --frozen-lockfile
+      - name: Publish the CLI and its template snapshot
+        working-directory: packages/mystack
+        env:
+          NPM_DIST_TAG: ${{ needs.release.outputs.dist-tag }}
+        run: npm publish --access public --provenance --tag "$NPM_DIST_TAG"
