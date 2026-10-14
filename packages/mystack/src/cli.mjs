@@ -30,6 +30,7 @@ import { createProject, validateName } from "./generate.mjs";
 const help = `mystack create [name] [options]
 
 Create a configured TanStack Start project with an interactive wizard.
+Run mystack without arguments to open the wizard.
 
   --database ${catalog.database.map((option) => option.id).join("|")}
   --deployment cloudflare|nitro|bun
@@ -110,8 +111,8 @@ export async function main(args = process.argv.slice(2)) {
 			console.log(help);
 			return 0;
 		}
-		if (positionals[0] !== "create" || positionals.length > 2)
-			throw new Error(help);
+		const [command = "create", projectName] = positionals;
+		if (command !== "create" || positionals.length > 2) throw new Error(help);
 		const selection = {};
 		for (const category of ["database", "deployment", "email"]) {
 			if (values[category] !== undefined)
@@ -130,7 +131,7 @@ export async function main(args = process.argv.slice(2)) {
 			);
 		intro(
 			values.yes
-				? `Creating a new Mystack app in ${positionals[1] ?? "my-app"}...`
+				? `Creating a new Mystack app in ${projectName ?? "my-app"}...`
 				: "Let's configure your Mystack application",
 		);
 		const checkName = (value) => {
@@ -143,7 +144,7 @@ export async function main(args = process.argv.slice(2)) {
 			}
 		};
 		const name =
-			positionals[1] ??
+			projectName ??
 			(values.yes
 				? "my-app"
 				: await answer(

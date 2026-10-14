@@ -1,19 +1,19 @@
 # Mystack CLI
 
-Create a configured TanStack Start application with `mystack create`. Install the CLI release tarball provided by a maintainer (Node.js 22.12+), then use the wizard:
+Create a configured TanStack Start application with the `@0x0501/mystack` CLI. Install Node.js 22.12+ and Bun, then open the wizard:
 
 ```sh
-npm install --global ./mystack-cli-0.1.0.tgz
-mystack create my-app
+bunx @0x0501/mystack
+bunx @0x0501/mystack@latest create my-app
 ```
 
-The public `@mystack/cli` npm package is not available yet. Generated projects use Bun and ship their own configuration-specific `README.md` plus `docs/project-guide.md`. New application users do not need a starter checkout.
+The package is owned by the personal npm account `0x0501`. Generated projects use Bun and ship their own configuration-specific `README.md` plus `docs/project-guide.md`. New application users do not need a starter checkout. You can also install the CLI globally with `npm install --global @0x0501/mystack` and run `mystack create`.
 
 For explicit configurations:
 
 ```sh
-mystack create my-app --yes --database d1 --deployment cloudflare --email resend --payments stripe,polar
-mystack create my-app --yes --database turso-local --deployment bun --email resend --payments none --no-install
+bunx @0x0501/mystack@latest create my-app --yes --database d1 --deployment cloudflare --email resend --payments stripe,polar
+bunx @0x0501/mystack@latest create my-app --yes --database turso-local --deployment bun --email resend --payments none --no-install
 ```
 
 The executable runs on Node 22.12+. Generated projects use Bun to install dependencies and run scripts. The wizard follows TanStack CLI's Clack interaction: guided selections, keyboard hints, a configuration summary and final confirmation, progress indicators, and commands to start the project. Use arrow keys to navigate, Space to toggle payment providers, and Enter to confirm; an empty payment selection means none. Ctrl-C or Escape cancels during configuration without creating a project. D1 and Cloudflare Email show incompatible options as disabled with a reason. Flags use the same validation rules; `--yes` skips all prompts. Failed dependency installation keeps the generated project and shows the command to retry.
@@ -32,9 +32,9 @@ The executable runs on Node 22.12+. Generated projects use Bun to install depend
 The default is PostgreSQL (Hyperdrive) with Cloudflare Workers. PostgreSQL migrations use the privileged `DATABASE_MIGRATION_URL`; runtime connections use the app role. Turso Cloud accepts remote `libsql://` or `https://` URLs and requires cloud credentials before migration and startup. Local databases need persistent file storage in production; generated projects ignore database files and their WAL sidecars in Git.
 
 ```sh
-mystack create cloud-app --database turso-cloud
-mystack create local-app --database turso-local --deployment nitro --email resend
-mystack create bun-app --database bun-sqlite --deployment bun --email resend
+bunx @0x0501/mystack@latest create cloud-app --database turso-cloud
+bunx @0x0501/mystack@latest create local-app --database turso-local --deployment nitro --email resend
+bunx @0x0501/mystack@latest create bun-app --database bun-sqlite --deployment bun --email resend
 ```
 
 ## Start your application
@@ -47,7 +47,7 @@ Enter the generated directory, copy `.env.example` to `.env`, and configure the 
 
 Contributors use the repository's [maintainer guide](../../docs/contributing.md) for local CLI development, schema generation, tests and release packaging. The root application is the single runnable template source; `template/` is an ignored release snapshot and `assets/` contains alternate files and database fixtures. See [ADR 0012](../../docs/adr/0012-mystack-project-generation.md).
 
-The tarball contains the snapshot and adapters, and works outside the checkout without fetching a moving Git branch. `prepack` refreshes the snapshot from an explicit allowlist; secrets, Git history, dependencies, and local build output are excluded. Publishing requires ownership of the `@mystack` scope.
+The tarball contains the snapshot and adapters, and works outside the checkout without fetching a moving Git branch. `prepack` refreshes the snapshot from an explicit allowlist; secrets, Git history, dependencies, and local build output are excluded. Tagged releases publish through GitHub Actions using npm trusted publishing; see the repository's [publishing guide](../../docs/publishing.md) for account setup.
 
 ## Extend
 

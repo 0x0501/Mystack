@@ -23,6 +23,7 @@ Our root application is already runnable, tested and used as the template source
 5. **Compose a file map and structured metadata.** Apply deployment → database → email → payments, regenerate routes and format the generated project. Prefer complete alternate files for independent integrations. Keep shared source transformations explicit and checked; add deliberate insertion points when composition warrants them. Do not build a general plugin or AST framework for the current fixed choices.
 6. **Do not add `examples/` or duplicate `templates/default/`.** An example needs an actual independently useful demonstration. A separate template source layout needs distinct maintained templates and a corresponding workspace/testing design; it should move the canonical source rather than copy it.
 7. **Ship configuration-specific instructions.** Generated `README.md` contains the selected database/runtime setup. Bundle `docs/project-guide.md` for application development; keep generator tutorials, research and maintainer instructions outside generated applications. `mystack.json` records creation choices and is not a live reconfiguration API.
+8. **Publish under the personal npm account `0x0501`.** The package is `@0x0501/mystack`; users run it through Bunx. Matching `v*` tags on `main` publish through GitHub Actions after CI passes, using npm trusted publishing. See [the publishing guide](../publishing.md).
 
 ## Consequences
 
@@ -31,4 +32,4 @@ Our root application is already runnable, tested and used as the template source
 - Template layout and rendering mechanisms remain separate decisions; adding a folder does not improve source transformations by itself.
 - PostgreSQL retains RLS and transactional paid hooks; SQLite variants enforce authorization with middleware/ownership predicates and atomically record durable delivery events.
 - The former PostgreSQL-only and Cloudflare-Email-only rules describe the reference template, while the catalog defines supported generated variants.
-- Until the public npm package exists, maintainers distribute a CLI tarball. User instructions must not assume an unpublished package is installable.
+- The initial npm publication registers the package before trusted publishing is configured. Subsequent releases use OIDC without a stored npm token.

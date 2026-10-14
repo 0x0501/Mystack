@@ -11,9 +11,8 @@ try {
 	const packed = JSON.parse(stdout)[0];
 	if (packed.files.some((entry) => /(?:^|\/)\.env$|\.git\/|node_modules\/|\.lix\//.test(entry.path))) throw new Error("Unexpected private or local files in release.");
 	await run("npm", ["install", "--prefix", temporary, join(temporary, packed.filename)], { maxBuffer: 2 * 1024 * 1024 });
-	const cli = join(temporary, "node_modules/@mystack/cli/src/cli.mjs");
-	await run(process.execPath, [cli, "create", "packed-app", "--yes", "--database", "d1", "--email", "resend", "--payments", "none", "--no-install"], { cwd: temporary });
-	const target = join(temporary, "packed-app");
+	await run("bunx", ["--no-install", "@0x0501/mystack", "--yes", "--database", "d1", "--email", "resend", "--payments", "none", "--no-install"], { cwd: temporary });
+	const target = join(temporary, "my-app");
 	await readFile(join(target, ".gitignore"));
 	const tree = await readFile(join(target, "src/routeTree.gen.ts"), "utf8");
 	if (/webhooks\//.test(tree)) throw new Error("Unselected payment routes survived generation.");

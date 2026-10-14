@@ -57,6 +57,6 @@ bun install --cwd packages/mystack --frozen-lockfile
 npm pack ./packages/mystack
 ```
 
-For version `0.1.0`, the output is `mystack-cli-0.1.0.tgz`; a version change changes the filename. Distribute that artifact to application users, who install it using `npm install --global ./mystack-cli-0.1.0.tgz` and run `mystack create`. The package works without a checkout or fetching a moving branch.
+For version `0.1.0`, the output is `0x0501-mystack-0.1.0.tgz`; a version change changes the filename. Use this artifact for local package verification. Public application users run `bunx @0x0501/mystack@latest` or `bunx @0x0501/mystack@latest create my-app`. The package works without a checkout or fetching a moving branch.
 
-Public npm publishing requires ownership of the `@mystack` scope. When a public release exists, update the user installation instructions to the published package and version. Packaging locally does not publish the CLI.
+The personal npm account `0x0501` owns the package. Follow [publishing.md](./publishing.md) to bootstrap it, configure GitHub Actions trusted publishing and release matching `v*` tags. Packaging locally does not publish the CLI.
