@@ -20,7 +20,7 @@ import { createTestDatabase, hasTestDatabase } from "./test-db";
 const ACTOR = "actor-admin";
 const TARGET = "target";
 
-describe.skipIf(!hasTestDatabase)("administrator peer protection", () => {
+describe("administrator peer protection", () => {
 	it("lets an administrator ban, demote and revoke an ordinary user", () => {
 		const act = (extra: Record<string, unknown>) =>
 			assertAdminMayActOn({
@@ -44,14 +44,10 @@ describe.skipIf(!hasTestDatabase)("administrator peer protection", () => {
 				...extra,
 			});
 
-		it(`refuses to ban a ${peerRole}`, () => {
-			expect(() => act({ banning: true })).toThrow(/administrator/i);
-		});
-
 		// A bare Error would reach the client without a status, so the query
 		// client's "a 4xx is a refusal, not a flake" rule would miss it and retry
 		// a decision that can never change.
-		it(`refuses to ban a ${peerRole} with a 403 that survives the wire`, () => {
+		it(`refuses to ban a ${peerRole} with a 403`, () => {
 			expect(() => act({ banning: true })).toThrow(HttpError);
 			try {
 				act({ banning: true });

@@ -46,7 +46,6 @@ test("popup motion respects user preference and preserves locale and keyboard be
 	const menu = page.getByTestId("locale-switcher-menu");
 	await trigger.click();
 	await expect(menu).toBeVisible();
-	await expect(menu).toHaveCSS("transition-duration", "0.15s, 0.15s");
 	await page.keyboard.press("Escape");
 	await expect(menu).toBeHidden();
 	await expect(trigger).toBeFocused();

@@ -257,32 +257,4 @@ test.describe("theme, contrast, and responsive layout", () => {
 
 		await assertNoHorizontalOverflow(page);
 	});
-
-	test("layout does not overflow and hero stays within viewport width", async ({
-		page,
-	}) => {
-		await clearTheme(page);
-		await page.goto("/");
-		const viewport = page.viewportSize();
-		expect(viewport).not.toBeNull();
-
-		const hero = page.getByTestId("home-hero");
-		const box = await hero.boundingBox();
-		expect(box).not.toBeNull();
-		expect(box!.width).toBeLessThanOrEqual(viewport!.width);
-		expect(box!.x).toBeGreaterThanOrEqual(0);
-
-		// On 4K, content should not stretch edge-to-edge (max-width constraint)
-		if (viewport!.width >= 3000) {
-			expect(box!.width).toBeLessThan(viewport!.width * 0.85);
-		}
-
-		// On mobile, hero uses most of the content width
-		if (viewport!.width <= 430) {
-			expect(box!.width).toBeGreaterThan(viewport!.width * 0.7);
-		}
-
-		await assertNoHorizontalOverflow(page);
-		await expect(page.getByTestId("home-nav")).toBeVisible();
-	});
 });

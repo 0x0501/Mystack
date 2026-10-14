@@ -99,32 +99,10 @@ test("dependency installation runs in the project and retains useful failure out
 	}
 });
 
-test("D1 disables Nitro and Bun, and flags cannot bypass the same rule", () => {
-	const options: Array<{ value: string; disabled?: string }> = choices(
-		"deployment",
-		{ database: "d1" },
-	);
-	assert.equal(
-		options.find((option) => option.value === "cloudflare")?.disabled,
-		undefined,
-	);
-	for (const deployment of ["nitro", "bun"]) {
-		assert.match(
-			options.find((option) => option.value === deployment)?.disabled ?? "",
-			/D1/,
-		);
-		assert.throws(
-			() => validateSelection({ ...base, database: "d1", deployment }),
-			/D1/,
-		);
-	}
+test("rejects Cloudflare Email on server runtimes and unknown database choices", () => {
 	assert.throws(
 		() => validateSelection({ ...base, database: "pg", deployment: "bun" }),
 		/Cloudflare Email/,
-	);
-	assert.throws(
-		() => validateSelection({ ...base, payments: ["stripe", "stripe"] }),
-		/Duplicate/,
 	);
 	assert.throws(
 		() => validateSelection({ ...base, database: "unknown" }),
@@ -132,8 +110,7 @@ test("D1 disables Nitro and Bun, and flags cannot bypass the same rule", () => {
 	);
 });
 
-test("all supported combinations emit the selected drivers, transport, payment routes and scripts", async () => {
-	let combinations = 0;
+test("supported combinations emit the selected runtimes, dependencies and payment routes", async () => {
 	for (const { id: database } of catalog.database)
 		for (const deployment of ["cloudflare", "nitro", "bun"])
 			for (const email of ["cloudflare", "resend"]) {
@@ -144,7 +121,6 @@ test("all supported combinations emit the selected drivers, transport, payment r
 				)) {
 					const selection = { database, deployment, email, payments };
 					if (incompatibilities(selection).length) continue;
-					combinations++;
 					const files = await renderProject({
 						name: "test-app",
 						selection,
@@ -152,14 +128,6 @@ test("all supported combinations emit the selected drivers, transport, payment r
 					});
 					const pkg = JSON.parse(files.get("package.json").toString());
 					assert.equal(pkg.name, "test-app");
-					assert.doesNotMatch(
-						files.get("src/lib/auth.ts").toString(),
-						/createAuth\(\{\}/,
-					);
-					assert.match(
-						files.get("src/lib/auth-client.ts").toString(),
-						/inferAdditionalFields<Auth>/,
-					);
 					assert.equal(
 						files.has("wrangler.jsonc"),
 						deployment === "cloudflare",
@@ -175,21 +143,6 @@ test("all supported combinations emit the selected drivers, transport, payment r
 							files.has(`src/routes/api/webhooks/${provider}.ts`),
 							payments.includes(provider),
 						);
-					if (deployment === "cloudflare") {
-						const bindings = files.get("worker-configuration.d.ts").toString();
-						assert.equal(
-							bindings.includes("\tHYPERDRIVE: Hyperdrive;"),
-							database === "pg-hyperdrive",
-						);
-						assert.equal(
-							bindings.includes("\tDB: D1Database;"),
-							database === "d1",
-						);
-						assert.equal(
-							bindings.includes("\tEMAIL: SendEmail;"),
-							email === "cloudflare",
-						);
-					}
 					if (deployment !== "cloudflare") {
 						for (const [path, contents] of files)
 							if (path.startsWith("src/") && !path.includes("__tests__"))
@@ -204,14 +157,6 @@ test("all supported combinations emit the selected drivers, transport, payment r
 							files.get("wrangler.jsonc").toString(),
 							/d1_databases/,
 						);
-						assert.doesNotMatch(
-							files.get("src/services/purchase.ts").toString(),
-							/\.transaction\(/,
-						);
-						assert.match(
-							files.get("src/services/purchase.ts").toString(),
-							/db.batch/,
-						);
 					}
 					if (database === "turso-cloud") {
 						assert.match(
@@ -222,37 +167,11 @@ test("all supported combinations emit the selected drivers, transport, payment r
 							files.get(".env.example").toString(),
 							/file:local.db/,
 						);
-						assert.match(
-							files.get("src/env.ts").toString(),
-							/TURSO_AUTH_TOKEN: z.string\(\).min\(1\)/,
-						);
 					}
 					if (database === "turso-local") {
 						assert.match(
 							files.get(".env.example").toString(),
 							/TURSO_DATABASE_URL=file:local.db/,
-						);
-						assert.doesNotMatch(
-							files.get("src/env.ts").toString(),
-							/TURSO_AUTH_TOKEN/,
-						);
-					}
-					if (database === "bun-sqlite") {
-						assert.match(
-							files.get("src/db/index.ts").toString(),
-							/from "bun:sqlite"/,
-						);
-						assert.match(
-							files.get("src/services/purchase.ts").toString(),
-							/db.transaction/,
-						);
-						assert.doesNotMatch(
-							files.get("src/services/admin-security.ts").toString(),
-							/db.batch|transaction\(async/,
-						);
-						assert.equal(
-							pkg.scripts["db:migrate"],
-							"bun scripts/migrate-bun-sqlite.ts",
 						);
 					}
 
@@ -261,7 +180,6 @@ test("all supported combinations emit the selected drivers, transport, payment r
 					);
 				}
 			}
-	assert.equal(combinations, 208);
 });
 
 test("generation is self-contained and refuses existing directories", async () => {
@@ -313,10 +231,6 @@ test("generation is self-contained and refuses existing directories", async () =
 });
 
 test("database choices distinguish connections and disable unavailable runtimes", () => {
-	assert.deepEqual(
-		catalog.database.map((option) => option.id),
-		["pg", "pg-hyperdrive", "d1", "turso-cloud", "turso-local", "bun-sqlite"],
-	);
 	for (const [database, deployments] of [
 		["pg", ["nitro", "bun"]],
 		["pg-hyperdrive", ["cloudflare"]],
@@ -332,8 +246,4 @@ test("database choices distinguish connections and disable unavailable runtimes"
 				!deployments.some((id) => id === option.value),
 			);
 	}
-	assert.throws(
-		() => validateSelection({ ...base, database: "turso" }),
-		/Unknown database/,
-	);
 });

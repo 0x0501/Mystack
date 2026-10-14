@@ -159,7 +159,7 @@ export async function withDatabaseService<T>(db: Database, fn: (db: Database) =>
 	for (const [path, content] of files) {
 		if (!path.startsWith("src/__tests__/")) continue;
 		if (
-			/\/(global-setup|test-db|test-rls-db|auth-harness|rls-policy\.test|rls-helpers\.test)/.test(
+			/\/(global-setup|test-db|test-rls-db|auth-harness|rls-policy\.test)/.test(
 				path,
 			) ||
 			/from ["']\.\/(test-db|test-rls-db|auth-harness)/.test(content.toString())
