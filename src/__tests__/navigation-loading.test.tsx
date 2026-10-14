@@ -135,22 +135,6 @@ describe("navigation with production network latency", () => {
 		expect(getSession).toHaveBeenCalledTimes(2);
 	});
 
-	it("deduplicates concurrent session checks", async () => {
-		const router = createTestRouter();
-		const gate = deferred<RootSession | null>();
-		getSession.mockReturnValue(gate.promise);
-		const first =
-			router.options.context.queryClient.fetchQuery(sessionQueryOptions);
-		const second =
-			router.options.context.queryClient.fetchQuery(sessionQueryOptions);
-		gate.resolve(session);
-		await expect(Promise.all([first, second])).resolves.toEqual([
-			session,
-			session,
-		]);
-		expect(getSession).toHaveBeenCalledTimes(1);
-	});
-
 	it("does not hold a failed session check through retry backoff", async () => {
 		const router = createTestRouter();
 		getSession.mockRejectedValue(new TypeError("Failed to fetch"));

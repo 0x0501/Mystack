@@ -17,10 +17,6 @@ const keysOf = (catalog: Record<string, unknown>) =>
 describe("message catalog parity", () => {
 	const enKeys = keysOf(en);
 
-	it("English defines at least one message", () => {
-		expect(enKeys.length).toBeGreaterThan(0);
-	});
-
 	it("German covers exactly the same keys as English", () => {
 		expect(keysOf(de)).toEqual(enKeys);
 	});

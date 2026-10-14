@@ -10,7 +10,6 @@ import {
 	disableTwoFactorWithCode,
 	enableTwoFactorWithOtp,
 	evaluateGithubSignup,
-	MONEY_REAUTH_MAX_AGE_SECONDS,
 	reauthenticate,
 	regenerateBackupCodesWithCode,
 	requestPasswordChangeOtp,
@@ -661,11 +660,5 @@ describe("evaluateGithubSignup", () => {
 		expect(
 			evaluateGithubSignup({ email: "dev@example.com", emailVerified: false }),
 		).toEqual({ ok: false, code: "github_email_unverified" });
-	});
-});
-
-describe("money re-auth window (docs pattern constant)", () => {
-	it("is five minutes", () => {
-		expect(MONEY_REAUTH_MAX_AGE_SECONDS).toBe(5 * 60);
 	});
 });

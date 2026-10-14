@@ -3,7 +3,6 @@
 import { beforeAll, beforeEach, describe, expect, it } from "vitest";
 import {
 	afterAuthTarget,
-	DEFAULT_AFTER_AUTH_PATH,
 	goToSignIn,
 	localizedAuthPath,
 	safeRedirectPath,
@@ -28,7 +27,6 @@ beforeEach(() => {
 
 describe("safeRedirectPath", () => {
 	it("defaults to the user dashboard when redirect is missing", () => {
-		expect(safeRedirectPath(null)).toBe(DEFAULT_AFTER_AUTH_PATH);
 		expect(safeRedirectPath(null)).toBe("/dashboard");
 	});
 

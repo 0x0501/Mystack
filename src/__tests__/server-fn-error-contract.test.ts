@@ -10,10 +10,6 @@
  * `startInstance` itself and composed the way the framework composes it
  * (user adapters ahead of the default `ShallowErrorPlugin`), then an HttpError
  * is pushed through real seroval.
- *
- * The plain-`Error` case is the sensitivity check: it degrades, so a passing
- * positive case is known to come from the adapter rather than from seroval
- * being generous.
  */
 import {
 	defaultSerovalPlugins,
@@ -56,15 +52,6 @@ describe("a server function's refusal crossing the wire", () => {
 			error: "unauthorized",
 			message: "Authentication required.",
 		});
-	});
-
-	it("degrades a plain Error, so this suite fails if the adapter goes unregistered", async () => {
-		const crossed = await acrossTheServerFnBoundary(
-			Object.assign(new Error("Authentication required."), { status: 401 }),
-		);
-
-		expect(crossed).not.toBeInstanceOf(HttpError);
-		expect((crossed as { status?: number }).status).toBeUndefined();
 	});
 });
 

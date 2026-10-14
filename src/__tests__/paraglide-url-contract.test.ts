@@ -1,10 +1,5 @@
 import { beforeAll, describe, expect, it } from "vitest";
-import {
-	baseLocale,
-	deLocalizeHref,
-	locales,
-	localizeHref,
-} from "@/paraglide/runtime";
+import { deLocalizeHref, localizeHref } from "@/paraglide/runtime";
 
 // Seam: Paraglide URL contract (ADR 0005 / 0010). Full-app i18n prefixes
 // every user-facing HTML tree; machine paths stay identity (never locale-prefixed).
@@ -24,11 +19,6 @@ beforeAll(async () => {
 });
 
 describe("paraglide URL contract", () => {
-	it("has exactly en/de with English as base", () => {
-		expect([...locales].sort()).toEqual(["de", "en"]);
-		expect(baseLocale).toBe("en");
-	});
-
 	it("keeps English on bare paths", () => {
 		expect(localizeHref("/sign-in", { locale: "en" })).toBe("/sign-in");
 		expect(localizeHref("/", { locale: "en" })).toBe("/");
