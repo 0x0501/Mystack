@@ -1,10 +1,18 @@
 # Mystack CLI
 
-Create a configured copy of this starter:
+Create a configured TanStack Start application with `mystack create`. Install the CLI release tarball provided by a maintainer (Node.js 22.12+), then use the wizard:
 
 ```sh
-mystack create
-mystack create my-app --database d1 --payments stripe,polar
+npm install --global ./mystack-cli-0.1.0.tgz
+mystack create my-app
+```
+
+The public `@mystack/cli` npm package is not available yet. Generated projects use Bun and ship their own configuration-specific `README.md` plus `docs/project-guide.md`. New application users do not need a starter checkout.
+
+For explicit configurations:
+
+```sh
+mystack create my-app --yes --database d1 --deployment cloudflare --email resend --payments stripe,polar
 mystack create my-app --yes --database turso-local --deployment bun --email resend --payments none --no-install
 ```
 
@@ -29,18 +37,17 @@ mystack create local-app --database turso-local --deployment nitro --email resen
 mystack create bun-app --database bun-sqlite --deployment bun --email resend
 ```
 
-## Develop and distribute
+## Start your application
 
-```sh
-bun install --cwd packages/mystack
-bun run --cwd packages/mystack template:prepare
-node packages/mystack/src/cli.mjs create
-npm pack ./packages/mystack
-npm install -g ./mystack-cli-0.1.0.tgz
-mystack create
-```
+Enter the generated directory, copy `.env.example` to `.env`, and configure the selected database/provider credentials. If dependencies were skipped or installation failed, run `bun install`. PostgreSQL variants need `bun run db:up` before migration; all variants use `bun run db:migrate` then `bun run dev`. Open http://localhost:3000. Authentication email is logged in development when provider credentials are absent. Follow the generated README for deployment.
 
-The tarball contains a template snapshot and adapters. It works outside this checkout without fetching a moving Git branch. `prepack` refreshes the snapshot from an explicit allowlist; secrets, Git history, dependencies, and local build output are excluded. The package is ready for a scoped npm release; publishing requires ownership of the `@mystack` scope.
+`mystack.json` records the creation choices. Editing it does not regenerate or convert an existing application.
+
+## Maintain and distribute the CLI
+
+Contributors use the repository's [maintainer guide](../../docs/contributing.md) for local CLI development, schema generation, tests and release packaging. The root application is the single runnable template source; `template/` is an ignored release snapshot and `assets/` contains alternate files and database fixtures. See [ADR 0012](../../docs/adr/0012-mystack-project-generation.md).
+
+The tarball contains the snapshot and adapters, and works outside the checkout without fetching a moving Git branch. `prepack` refreshes the snapshot from an explicit allowlist; secrets, Git history, dependencies, and local build output are excluded. Publishing requires ownership of the `@mystack` scope.
 
 ## Extend
 
@@ -59,4 +66,4 @@ Run `bun run test:cli` for the 208 valid selection combinations, filesystem safe
 
 ## Reference
 
-The deployment adapters follow [TanStack Start hosting](https://tanstack.com/start/latest/docs/framework/react/guide/hosting). Composition follows the template/add-on separation in the [TanStack CLI](https://tanstack.com/cli/latest/docs/creating-add-ons). Nitro uses its Node preset; Bun uses Start's server bundle with a native `Bun.serve` entry. Credentials and cloud resource IDs must be supplied by the project owner; generation does not create paid cloud resources.
+The deployment adapters follow [TanStack Start hosting](https://tanstack.com/start/latest/docs/framework/react/guide/hosting). TanStack CLI composes [base, add-on and template files](https://github.com/TanStack/cli/blob/3f2d3d32e0bc745a9b892ce767555a7f7b4dd591/packages/create/src/create-app.ts#L66-L149), renders EJS and merges package metadata. Mystack uses its own fixed catalog, file adapters and checked source transformations; it does not invoke TanStack CLI. See the repository's [source-backed comparison](../../docs/research/tanstack-cli-generation.md). Nitro uses its Node preset; Bun uses Start's server bundle with a native `Bun.serve` entry. Credentials and cloud resource IDs must be supplied by the project owner; generation does not create paid cloud resources.

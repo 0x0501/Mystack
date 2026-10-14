@@ -1,8 +1,10 @@
-# Outbound mail is Cloudflare Email only
+# Cloudflare Email in the reference configuration
 
 ## Status
 
 Accepted — 2026-08-01.
+
+Amended — 2026-10-13 by [ADR 0012](./0012-mystack-project-generation.md). The Cloudflare Email contract below applies to the root reference template. Mystack selects Cloudflare Email (Workers only) or Resend at project creation; generated applications include their selected transport.
 
 ## Context
 

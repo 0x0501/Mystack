@@ -14,7 +14,9 @@ Important:
 
 ## What this is
 
-A TanStack Start template that runs on Cloudflare Workers, using Better Auth as a self-hosted **OAuth 2.0 / OIDC identity provider** (it *issues* tokens to clients — it is not a social-login consumer). Data lives in PostgreSQL, reached from the Worker through the Cloudflare Hyperdrive binding via Drizzle ORM.
+A TanStack Start reference template and the Mystack project generator. **New applications are created with `mystack create`**, not by using a checkout as product source. The root application is the single canonical runnable template; `packages/mystack/template/` is an ignored release snapshot rebuilt by `prepack`. See `docs/contributing.md` and ADR 0012.
+
+The root reference configuration runs on Cloudflare Workers, using Better Auth as a self-hosted **OAuth 2.0 / OIDC identity provider** (it *issues* tokens to clients — it is not a social-login consumer). Data lives in PostgreSQL, reached from the Worker through the Cloudflare Hyperdrive binding via Drizzle ORM. Mystack's catalog and adapters generate the other supported database, runtime, email and payment configurations. The stack and application paths below describe the root reference configuration.
 
 ## Stack
 
@@ -126,5 +128,6 @@ Both pages use a pass-through `validateSearch` so the signed query stays in the 
   - `dev` and `build` regenerate the tree too, via the Start plugin. The plugin appends a `declare module '@tanstack/react-start'` footer that the standalone `tsr` CLI knows nothing about, so `tsr.config.json` carries a hand-copy of it under `routeTreeFileFooter` to keep both generators byte-identical. CI diffs the tree after `build`; if a TanStack upgrade changes that footer, that diff is where it surfaces — update `tsr.config.json` to match.
 - Keep `tanstackStartCookies()` last in the Better Auth plugins array.
 - **Tests** go in `src/__tests__/` (`*.test.ts[x]`) — not colocated next to source.
+- Test observable application behavior and material failure cases. Do not add tests for README wording, copied constants, export existence, source formatting, third-party defaults, or behavior already exercised by a retained test.
 - **Business/domain logic** goes in `src/services/`, kept framework-agnostic; `src/lib/` is only for framework glue and config.
 - **Server functions** (`createServerFn`) go in `src/server/` — keep them thin and delegate to `src/services/`.

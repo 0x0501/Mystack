@@ -1,10 +1,22 @@
 # TanStack Starter context
 
-A generic SaaS starter for TanStack Start on Cloudflare Workers. New products clone this repository and add their own domain; the Starter ships **platform capabilities only**.
+A generic SaaS starter generated with Mystack. New products use `mystack create` and add their own domain in the generated application; the Starter ships **platform capabilities only**. The repository root is the canonical PostgreSQL + Hyperdrive / Cloudflare Workers reference template, maintained alongside the CLI. See [ADR 0012](./docs/adr/0012-mystack-project-generation.md).
 
 ## Language
 
 ### Product boundary
+
+**Mystack**:
+The project creation CLI. Its catalog selects database, deployment runtime, email and payment integrations. It bundles a versioned snapshot of the reference template and produces a standalone application.
+_Avoid_: using a starter checkout as a new product; treating the CLI as an application runtime or upgrade dependency.
+
+**Reference template**:
+The single runnable application at the repository root. Maintainers edit and test it directly; `packages/mystack/template/` is its ignored release snapshot, rebuilt by `prepack`.
+_Avoid_: editing the release snapshot; maintaining a second full application under `templates/default/`.
+
+**Generated project**:
+An independently maintained application produced by `mystack create`, with selected integrations, migrations, environment examples and its own README. `mystack.json` records creation choices; editing it does not reconfigure source.
+_Avoid_: clone workflow; treating all generated variants as PostgreSQL / Workers applications.
 
 **Starter**:
 The reusable application skeleton in this repo. It ships platform capabilities only and deliberately excludes any product domain.
@@ -24,7 +36,7 @@ _Avoid_: greenfield redesign of auth/pipeline contracts “for the starter”; i
 
 **Reference platform (private)**:
 The mature production system whose platform patterns the Starter extracts. It is not a dependency, not a package, and not mentioned by name in the open template.
-_Avoid_: linking clones back to the private monorepo; treating product features of that system as Starter defaults.
+_Avoid_: linking generated projects back to the private monorepo; treating product features of that system as Starter defaults.
 
 **Inventiveness**:
 Starter-only redesign of a platform concern that already has a proven pattern (alternate error bus, button-only locale switcher, dropping HttpError wire serialization, default localize-all URLs). Inventiveness is a defect relative to extraction fidelity. Replacing presentation, theme tokens, layouts, or animations is expected Headless customization, not inventiveness.
@@ -53,7 +65,7 @@ The account's only human identity field — free-form text, not unique, not used
 _Avoid_: username, handle, nickname as Starter identity fields.
 
 **Locale preference**:
-The account's stored preferred locale (`user.locale`). Signed-in routing and emails honor it; anonymous visitors use the URL locale and Accept-Language where edge detect exists. URL prefixes are the addressable form of **every** Starter user-facing page (public, auth, dashboard, admin). In-tree message locales are English (`en`) and German (`de`); clones add or replace locales as needed.
+The account's stored preferred locale (`user.locale`). Signed-in routing and emails honor it; anonymous visitors use the URL locale and Accept-Language where edge detect exists. URL prefixes are the addressable form of **every** Starter user-facing page (public, auth, dashboard, admin). In-tree message locales are English (`en`) and German (`de`); generated projects add or replace locales as needed.
 _Avoid_: cookie-only locale for the authenticated app; English-only app paths or chrome; locale-prefixing `/api` or `/.well-known`.
 
 **Full-app URL i18n**:
@@ -69,7 +81,7 @@ Control that changes language via real same-page localized links (path, query, a
 _Avoid_: client-only locale flips that drop OAuth query state; crawler-invisible switchers as the only mechanism.
 
 **Social login**:
-GitHub is the only OAuth consumer shipped in the Starter. Additional social providers are clone-time additions, not Starter defaults.
+GitHub is the only OAuth consumer shipped in the Starter. Additional social providers are project-specific additions, not Starter defaults.
 _Avoid_: Google/Apple as required Starter integrations; social-only registration without verified email rules.
 
 **Account linking**:
@@ -165,8 +177,8 @@ _Avoid_: simplifying away HttpError serialization, original-Request handoff, or 
 ### Mail, captcha, i18n
 
 **Outbound mail**:
-Platform-originated email delivered only through the Cloudflare Email (`send_email`) binding in production. Templates are react-email; the From display name is a clone-time brand string from env, not a hard-coded product name.
-_Avoid_: Resend/SMTP as Starter production transports; multi-provider email product.
+Platform-originated email uses the transport selected at generation: Cloudflare Email (`send_email`) on Workers, or Resend on any supported runtime. The reference template uses Cloudflare Email. Templates are react-email; the From display name is a project brand string from env.
+_Avoid_: assuming every generated project has an EMAIL binding; a product-level mail transport management system.
 
 **Turnstile gate**:
 Cloudflare Turnstile on an explicit Better Auth path list (sign-up, sign-in, forgot-password, and any other paths kept in that allowlist). Dev may run with captcha disabled when no site key is configured; production expects real keys.
@@ -183,15 +195,15 @@ _Avoid_: `check` = format-only; `"latest"` for TanStack/platform packages; deplo
 ### Data & payments
 
 **Database**:
-PostgreSQL is the only supported database. Production access is through Cloudflare Hyperdrive; migrations use a direct migration URL. SQLite and dual-adapter paths are out of the Starter.
-_Avoid_: D1 as default; sqlite for "easy dev"; multi-database support.
+One database driver is selected at generation: direct PostgreSQL, PostgreSQL + Hyperdrive, D1, Turso Cloud, local libSQL or Bun SQLite. The reference template uses PostgreSQL + Hyperdrive; PostgreSQL migrations use a privileged direct migration URL, separate from runtime access.
+_Avoid_: assuming SQLite has PostgreSQL RLS; selecting multiple application databases at runtime.
 
 **RLS skeleton**:
-The Starter ships a minimal Postgres row-level security pattern (service vs user transaction scopes, role-gated policies) with platform tables only. Product tables and their policies are clone-time work.
+PostgreSQL variants ship a minimal row-level security pattern (service vs user transaction scopes, role-gated policies) with platform tables only. SQLite variants use authenticated/admin middleware and explicit ownership predicates. Product tables and their authorization are project work.
 _Avoid_: app-layer-only auth as the sole story; product RLS policies living in the Starter by default.
 
 **Payment provider adapter**:
-An optional integration with an external payment rail (Stripe, Creem, NowPayments) that verifies webhooks/IPN and notifies the app of a completed purchase. Optional at runtime (env + enable toggles); not a wallet and not a SaaS subscription product. Each rail owns one module holding its signature verification and its framework-agnostic handler together — the rails do not share a state machine, so they are parallel, not factored behind one interface.
+An optional integration with an external payment rail (Stripe, Creem, NOWPayments, Polar) that verifies webhooks/IPN and notifies the app of a completed purchase. Selected at generation and enabled at runtime through env + enable toggles; not a wallet and not a SaaS subscription product. Each rail owns one module holding its signature verification and its framework-agnostic handler together — the rails do not share a state machine, so they are parallel, not factored behind one interface.
 _Avoid_: recharge order, wallet credit, top-up (product-domain); payment plugin as the product; a single generic webhook interface the rails plug into.
 
 **Purchase**:
@@ -199,7 +211,7 @@ One payment attempt the Starter records for idempotency (provider, external id, 
 _Avoid_: order (unless the product domain defines Order); top-up; recharge; subscription.
 
 **Purchase-paid hook**:
-The single extension point the Starter calls after a Purchase is confirmed paid, exactly once. It runs inside the transaction that flips the Purchase to paid and receives that transaction, so a throw rolls the flip back and the provider's retry re-enters and delivers once. Because it shares the transaction it does database work only; fulfillment that needs IO writes a durable row in the hook and does the IO afterwards. Product domain implements fulfillment (entitlement, credit, flag).
+The product fulfillment extension point after a Purchase is confirmed paid. PostgreSQL calls the hook inside the transaction that flips the Purchase to paid and passes that transaction; a throw rolls the flip back, so the provider's retry re-enters. The hook does database work only; fulfillment that needs IO writes a durable row and performs IO afterward. SQLite atomically writes a durable `purchase_delivery` event with the paid state; the product consumes it using `purchase_id` as its idempotency key. Product domain implements fulfillment (entitlement, credit, flag).
 _Avoid_: wallet credit handler as Starter default; product-specific settlement logic; HTTP calls or email sends inside the hook; describing delivery as "at most once" (the flip alone was that, and it lost deliveries).
 
 **Payment method toggle**:
@@ -212,7 +224,7 @@ _Avoid_: request log; every sign-in as an audit row.
 
 ## Invariants
 
-- The Starter contains no product domain. Clones add domain tables, policies, and pages outside the platform surface.
+- The Starter contains no product domain. Generated projects add domain tables, policies, and pages outside the platform surface.
 - Platform changes follow **extraction fidelity**: strip product domain from proven patterns; do not invent parallel platform semantics.
 - Shippable tree and docs do not name the private reference product, monorepo paths, or production-only internal services.
 - Every account has a verified email before notification-dependent and social-link flows that assume a delivery channel.
@@ -231,7 +243,7 @@ _Avoid_: request log; every sign-in as an audit row.
 - A payment webhook answers 400 for a bad signature, 200 for every mapped outcome, and 5xx only when processing genuinely failed — the provider's retry is what makes fulfillment exactly-once.
 - Fulfillment trusts the Purchase row's amount and user, never amounts reported only in a payment callback.
 - Payment provider adapters that are disabled or unconfigured are refused server-side.
-- Production database access is Hyperdrive → Postgres; the Better Auth Drizzle adapter is `pg` only.
+- Each generated application uses its selected database/runtime. PostgreSQL uses app-role runtime access and privileged migration credentials, with RLS; SQLite uses explicit ownership predicates and authenticated/admin middleware. Better Auth's Drizzle dialect matches the selected driver.
 - UI is Headless: Base UI owns composite interactions; the default theme/layout/motion are replaceable. No visual style or animation approach is mandatory. Accessibility and platform flow contracts survive customization.
 - User-facing pages are full-app i18n (messages + URL prefixes for public, auth, dashboard, admin; en/de in-tree); `/api` and `/.well-known` stay unprefixed; signed-in locale preference is stored on the user.
 - Auth pages expose the same capabilities the server enables (Turnstile, GitHub, passkey) when those are configured — UI must not lag plugins.
@@ -240,4 +252,4 @@ _Avoid_: request log; every sign-in as an audit row.
 
 ## Deliberate non-goals
 
-Product-domain concepts that must not become Starter defaults include (non-exhaustive): multi-bucket wallets, ledger/recharge products, consumer API-key products, marketplace provider applications, referral/invitee rewards, gateway/routing meshes, and withdrawal flows. Clones may implement any of these outside the platform surface.
+Product-domain concepts that must not become Starter defaults include (non-exhaustive): multi-bucket wallets, ledger/recharge products, consumer API-key products, marketplace provider applications, referral/invitee rewards, gateway/routing meshes, and withdrawal flows. Generated projects may implement any of these outside the platform surface.

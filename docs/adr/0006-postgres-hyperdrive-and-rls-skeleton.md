@@ -1,8 +1,10 @@
-# Postgres + Hyperdrive only, with an RLS skeleton
+# PostgreSQL + Hyperdrive reference configuration and RLS
 
 ## Status
 
 Accepted — 2026-08-01.
+
+Amended — 2026-10-13 by [ADR 0012](./0012-mystack-project-generation.md). The decisions below apply to the root reference template. Mystack-generated applications additionally support direct PostgreSQL, D1, Turso Cloud, local libSQL and Bun SQLite; SQLite uses middleware and explicit ownership predicates instead of PostgreSQL RLS.
 
 ## Context
 

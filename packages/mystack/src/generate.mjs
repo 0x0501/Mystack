@@ -137,7 +137,7 @@ function projectReadme({ name, selection }) {
 	};
 	return `# ${name}
 
-Generated with Mystack. Configuration is recorded in mystack.json.
+Generated with \`mystack create\`. Configuration is recorded in \`mystack.json\`; editing it does not regenerate or convert the application. This project is maintained independently of the generator repository.
 
 Database: ${label("database", selection.database)}; runtime: ${label("deployment", selection.deployment)}; email: ${label("email", selection.email)}; payments: ${selection.payments.map((id) => label("payments", id)).join(", ") || "none"}.
 
@@ -147,22 +147,37 @@ ${databaseNotes[selection.database]}
 
 ## Local development
 
+Use Bun for application commands.${isPostgres(selection.database) ? " Local PostgreSQL also needs Docker." : ""} Mystack normally installs dependencies; run \`bun install\` if installation was skipped or failed.
+
 \`\`\`sh
-bun install
 cp .env.example .env
-# Configure the selected database and provider credentials in .env first.
+\`\`\`
+
+Configure the selected database and provider credentials in \`.env\`, then run:
+
+\`\`\`sh
 ${isPostgres(selection.database) ? "bun run db:up\nbun run db:migrate" : "bun run db:migrate"}
 bun run dev
 \`\`\`
 
-Use http://localhost:3000. Authentication email is printed in development when credentials are absent.
+Use **http://localhost:3000**, matching the example app/auth origins. Authentication email is printed in development when credentials are absent. ${isPostgres(selection.database) ? "Use `bun run db:seed` for optional local test users." : "Create your account through normal sign-up and use the development email to verify it."}
+
+## Project development
+
+See [docs/project-guide.md](./docs/project-guide.md) for source layout, authentication, database authorization, payment fulfillment, localization and validation. See [DESIGN.md](./DESIGN.md) for presentation conventions.
+
+\`\`\`sh
+bun run check
+bun run typecheck
+bun run test:unit
+\`\`\`
 
 ## Production
 
-Set a new BETTER_AUTH_SECRET and real application origins. Configure the selected database and verified email sender. Payment webhooks live at /api/webhooks/<provider>; set the matching signature secret and register that URL with each provider.
+Set a new \`BETTER_AUTH_SECRET\` and real application origins. Configure the selected database and verified email sender. ${selection.payments.length ? `Selected payment webhooks: ${selection.payments.map((provider) => `\`/api/webhooks/${provider}\``).join(", ")}. Set their matching signature secrets and register these URLs with the providers.` : "No payment providers or webhook routes were selected."}
 
-${selection.deployment === "cloudflare" ? "Configure wrangler.jsonc resource IDs, authenticate with wrangler login, create .env.prod, and run bun run deploy. Apply database migrations before deployment." : "Inject environment variables in the hosting environment, run bun run build, then bun run start. Apply database migrations before starting the server."}
+${selection.deployment === "cloudflare" ? `Configure the selected resources in \`wrangler.jsonc\`, authenticate with \`bunx wrangler login\`, create \`.env.prod\`, and run \`bun run deploy\`. ${selection.database === "d1" ? "Create the hosted D1 database, replace its placeholder ID, and apply hosted migrations with `bun run db:migrate:remote` before deployment." : "Apply `bun run db:migrate` with production migration credentials before deployment."}${selection.database === "pg-hyperdrive" ? " Set a real Hyperdrive configuration ID and app-role connection credentials." : ""}` : "Inject production environment variables in the hosting environment, apply database migrations, run `bun run deploy` for validation and build checks, then `bun run start`."}
 
-${!isPostgres(selection.database) ? `SQLite payments commit a durable purchase_delivery event atomically with the paid state, using ${selection.database === "bun-sqlite" ? "a synchronous Bun SQLite transaction" : "the driver's atomic batch"}. Product fulfillment consumes these events using purchase_id as the idempotency key. SQLite authorization uses authenticated/admin middleware and explicit ownership predicates.\n\n` : ""}See DESIGN.md for presentation conventions.
+${!isPostgres(selection.database) ? `SQLite payments commit a durable \`purchase_delivery\` event atomically with the paid state, using ${selection.database === "bun-sqlite" ? "a synchronous Bun SQLite transaction" : "the driver's atomic batch"}. Implement product fulfillment by consuming these events using \`purchase_id\` as the idempotency key. SQLite authorization uses authenticated/admin middleware and explicit ownership predicates.\n` : ""}
 `;
 }
