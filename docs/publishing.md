@@ -11,7 +11,7 @@ bunx @0x0501/mystack@latest create my-app
 
 `.github/workflows/publish-mystack.yml` runs when a `v*` tag is pushed. It requires the tagged commit to be on `main` and the tag to equal `v` plus the version in `packages/mystack/package.json`. It calls the existing CI workflow before publishing: application checks, PostgreSQL tests, builds, generated-project verification and packaged CLI verification must all pass.
 
-The publishing job uses a GitHub-hosted runner, Node 24, npm 11 and OIDC with `id-token: write`. `prepack` rebuilds the template snapshot. Stable versions receive the `latest` distribution tag; prereleases receive `next`. No npm token or GitHub environment is used. See [npm trusted publishing](https://docs.npmjs.com/trusted-publishers/).
+The publishing job uses a GitHub-hosted runner, Node 24, npm 11 and OIDC with `id-token: write`. `prepack` rebuilds the template snapshot. Every successful tag-triggered release updates the `latest` distribution tag to the published version, including prereleases, through `npm publish --tag latest`. No npm token or GitHub environment is used. See [npm trusted publishing](https://docs.npmjs.com/trusted-publishers/).
 
 ## Set up the personal npm account once
 
@@ -82,6 +82,6 @@ git tag v0.1.1
 git push origin v0.1.1
 ```
 
-If `main` requires pull requests, submit the version commit through a PR and tag the merged commit. For a prerelease such as `0.2.0-beta.1`, use the matching `v0.2.0-beta.1` tag; users opt in with `bunx @0x0501/mystack@next`.
+If `main` requires pull requests, submit the version commit through a PR and tag the merged commit. A prerelease such as `0.2.0-beta.1` uses the matching `v0.2.0-beta.1` tag and also becomes `latest`.
 
 Published versions are immutable. A failed run before publication can be retried after correcting configuration; once a version is published, release a new version instead of moving or reusing its tag. See [npm versioning and publication](https://docs.npmjs.com/cli/v11/commands/npm-publish/).
