@@ -3,9 +3,11 @@
 **Status:** Living baseline — capability catalog  
 **Date:** 2026-08-01  
 **Glossary:** `CONTEXT.md`  
-**ADRs:** `docs/adr/0001`–`0011`  
+**ADRs:** `docs/adr/0001`–`0012`
 
 **Policy update (2026-10-09):** UI follows [Headless design](../../DESIGN.md) and amended ADR 0007. The [alignment spec](./2026-08-02-platform-alignment-extraction.md) records earlier platform remediation; its original structure-only visual restrictions are superseded. This document remains the capability catalog.
+
+**Generation update (2026-10-13):** [ADR 0012](../adr/0012-mystack-project-generation.md) defines the current entry point: new projects use `mystack create`. PostgreSQL / Hyperdrive / Workers / Cloudflare Email below describe the reference configuration; the Mystack catalog additionally supports the generated database, runtime and email variants. References to clones mean independently generated applications.
 
 ---
 

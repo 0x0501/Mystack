@@ -7,6 +7,8 @@
 **Current UI policy:** [Headless design](../../DESIGN.md) and amended ADR 0007 supersede the original structure-only styling and motion restrictions. Platform security, wire, OAuth, and i18n contracts remain applicable.
 **Supersedes partial claims in:** `2026-08-01-platform-capabilities.md` definition-of-done where implementation drifted
 
+**Current creation policy (2026-10-13):** [ADR 0012](../adr/0012-mystack-project-generation.md) supersedes repository cloning as the creation workflow. This historical remediation describes the reference configuration; generated integration choices are defined by Mystack's catalog. New applications use `mystack create`.
+
 ---
 
 ## Problem Statement

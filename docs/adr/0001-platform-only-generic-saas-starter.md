@@ -5,6 +5,7 @@
 Accepted — 2026-08-01.
 Amended — 2026-08-02 (extraction fidelity).
 Amended — 2026-10-09 (Headless presentation is customizable).
+Amended — 2026-10-13 ([ADR 0012](./0012-mystack-project-generation.md): new projects are generated with Mystack).
 
 ## Context
 
@@ -16,7 +17,7 @@ Equally damaging: **reinventing** platform infrastructure that a mature producti
 
 1. The Starter ships **platform capabilities only**: identity, roles, Hyperdrive, mail, Turnstile, optional payment provider adapters, standard auth pages, user dashboard, and admin console. It does **not** ship product-domain features such as wallets, API gateways, marketplace providers, referral ledgers, or recharge/top-up as a product.
 
-2. The repository is a **standalone template**. Clones do not share packages back into other products for “common auth” (that path reintroduces domain leakage).
+2. The repository maintains the **standalone template source and Mystack CLI**. New applications use `mystack create` and own the generated source; they do not share packages back into other products for “common auth” (that path reintroduces domain leakage).
 
 3. **Extraction fidelity (2026-08-02):** Platform code is obtained by **stripping product domain from a mature reference platform pattern**, not by redesigning the platform layer from scratch. Allowed deltas: remove product domain; env-driven brand strings; locale set (`en`/`de`); standalone packaging; omit optional observability until adopted; customize presentation, theme tokens, layout, and motion under `DESIGN.md`. Disallowed deltas: alternate load-bearing pipeline semantics, or dropping wire/OAuth/i18n contracts to “keep the starter small.” Open docs and shippable comments never name the private reference product, its domains, or monorepo paths.
 

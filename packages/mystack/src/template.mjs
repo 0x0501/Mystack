@@ -27,6 +27,7 @@ export const templateEntries = [
 	".env.docker",
 	".gitignore",
 	"DESIGN.md",
+	"docs/project-guide.md",
 	"LICENSE",
 ];
 
@@ -67,6 +68,7 @@ export async function readTemplate(root, { packaged = false } = {}) {
 		".env.example",
 		"messages/en.json",
 		"messages/de.json",
+		"docs/project-guide.md",
 	]) {
 		if (!files.has(path))
 			throw new Error(
