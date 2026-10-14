@@ -65,12 +65,12 @@ The account's only human identity field — free-form text, not unique, not used
 _Avoid_: username, handle, nickname as Starter identity fields.
 
 **Locale preference**:
-The account's stored preferred locale (`user.locale`). Signed-in routing and emails honor it; anonymous visitors use the URL locale and Accept-Language where edge detect exists. URL prefixes are the addressable form of **every** Starter user-facing page (public, auth, dashboard, admin). In-tree message locales are English (`en`) and German (`de`); generated projects add or replace locales as needed.
-_Avoid_: cookie-only locale for the authenticated app; English-only app paths or chrome; locale-prefixing `/api` or `/.well-known`.
+The account's stored preferred locale (`user.locale`). Signed-in routing and emails honor it; anonymous visitors use the URL locale and Accept-Language where edge detect exists. URL prefixes are the addressable form of **every** Starter user-facing page (public, auth, dashboard, admin). The bundled message catalogs use `en` (default) and `de`; generated projects add or replace locales as needed.
+_Avoid_: cookie-only locale for the authenticated app; unlocalized app paths or chrome; locale-prefixing `/api` or `/.well-known`.
 
 **Full-app URL i18n**:
 Every user-facing HTML route is both message-localized and locale-prefixed in the URL (e.g. `/de/dashboard`, `/de/admin/users`). Incomplete localization in a private reference product is not a Starter exemption.
-_Avoid_: public-only URL i18n; path-neutral dashboard/admin “until later”; English-only authenticated island.
+_Avoid_: public-only URL i18n; path-neutral dashboard/admin “until later”; unlocalized authenticated island.
 
 **URL pattern allowlist**:
 Explicit Paraglide URL patterns that locale-prefix **all** Starter user-facing HTML trees (public, auth, dashboard, admin), with an identity catch-all so machine paths (`/api/*`, `/.well-known/*`, webhooks) stay unprefixed.
@@ -148,11 +148,11 @@ _Avoid_: throwing bare `Error` for auth refusals; omitting the serialization ada
 
 **User dashboard**:
 Signed-in member shell under `/dashboard` (locale prefix wraps the path under full-app URL i18n): overview and account pages. Overview is a session and account-security status surface (identity, verification, 2FA, passkeys, linked GitHub) — not product metrics. Account is one page with profile (display name, locale), security (password via email OTP, 2FA, passkeys), sessions, and linked accounts (GitHub).
-_Avoid_: admin backend; fake SaaS KPI widgets; separate `/security` route as the Starter default; English-only or path-neutral dashboard.
+_Avoid_: admin backend; fake SaaS KPI widgets; separate `/security` route as the Starter default; unlocalized or path-neutral dashboard.
 
 **Admin console**:
 Administrator shell under `/admin` (locale prefix wraps the path under full-app URL i18n): Users, Audit Log, and OAuth Apps. Reachable by Admin and Superadmin alike.
-_Avoid_: superadmin-only backend as a second product; CMS; English-only or path-neutral admin.
+_Avoid_: superadmin-only backend as a second product; CMS; unlocalized or path-neutral admin.
 
 **Headless UI**:
 Interaction and platform behavior are independent of visual identity. Base UI owns composite interaction semantics; replaceable CSS and page composition own appearance. A default skin makes platform flows usable out of the box. Headless does not mean minimalist or prohibit branding, tokens, or motion. See `DESIGN.md`.
@@ -185,7 +185,7 @@ Cloudflare Turnstile on an explicit Better Auth path list (sign-up, sign-in, for
 _Avoid_: captcha on every authenticated route; always-on captcha with no local bypass.
 
 **Full-app i18n**:
-Every user-facing page the Starter ships — public, auth, user dashboard, and admin console — is localized through Paraglide in **messages and URL**. There is no English-only authenticated island. Machine routes (`/api`, `/.well-known`, webhooks) stay unprefixed via the identity catch-all.
+Every user-facing page the Starter ships — public, auth, user dashboard, and admin console — is localized through Paraglide in **messages and URL**. There is no unlocalized authenticated island. Machine routes (`/api`, `/.well-known`, webhooks) stay unprefixed via the identity catch-all.
 _Avoid_: public-only i18n; message-only dashboard/admin without URL prefixes; localize-all defaults that prefix API.
 
 **Platform hygiene**:

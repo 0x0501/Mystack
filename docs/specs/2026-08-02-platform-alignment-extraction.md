@@ -72,10 +72,10 @@ Prefer **existing** seams. Do not introduce new package boundaries. Ideal owners
 7. As a **platform maintainer**, I want “extract, don’t invent” written in ADR/CONTEXT, so that agents stop greenfielding platform code.
 8. As a **platform maintainer**, I want shippable comments free of private monorepo paths, so that the open template does not imply private affiliation.
 9. As a **platform maintainer**, I want static checks for raw SQL, server-fn method contracts, and client-bundle boundaries in the default `check` script, so that CI catches regressions the mature platform already guards.
-10. As a **signed-out visitor**, I want public pages under locale URL prefixes, so that English and German pages are addressable and shareable.
+10. As a **signed-out visitor**, I want public pages under locale URL prefixes, so that pages in both bundled locales are addressable and shareable.
 11. As a **signed-out visitor**, I want a locale switcher that preserves path, query, and hash via real links, so that OAuth and deep links do not drop state and crawlers see both locales.
 12. As a **signed-out visitor**, I want Accept-Language and an explicit locale cookie to cooperate with URL strategy without redirect loops, so that first visits feel sensible.
-13. As a **user**, I want every Starter chrome string localized, so that dashboard and admin are not English-only islands.
+13. As a **user**, I want every Starter chrome string localized, so that dashboard and admin are localized throughout.
 14. As a **user**, I want dashboard and admin URLs themselves locale-prefixed (e.g. `/de/dashboard`), so that full-app i18n is addressable and shareable, not message-only.
 15. As a **user**, I want my `user.locale` honored for signed-in routing and email, so that preference survives sessions.
 16. As a **user**, I want sign-in and sign-up to offer email/password plus GitHub and passkey when configured, so that platform claims match the UI.
@@ -164,7 +164,7 @@ Prefer **existing** seams. Do not introduce new package boundaries. Ideal owners
 ### E. Auth and security pages
 
 26. Sign-in / sign-up must wire: email/password, Turnstile when captcha enabled, GitHub when configured, passkey when appropriate, already-signed-in redirect, OAuth resume helpers that preserve signed query.
-27. Forgot/reset/2FA/consent use the same composed Field/Button patterns and localized messages (no English-only literals for primary chrome).
+27. Forgot/reset/2FA/consent use the same composed Field/Button patterns and localized messages (no hard-coded default-locale copy for primary chrome).
 28. Account page uses composed controls; Tabs active state follows Base UI (`data-active`, not Select’s selected attribute).
 
 ### F. UI shell (amends ADR 0007)
