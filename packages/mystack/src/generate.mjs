@@ -128,10 +128,9 @@ function projectReadme({ name, selection }) {
 		"pg-hyperdrive":
 			"PostgreSQL connects through the Cloudflare HYPERDRIVE binding. Local development uses hyperdrive.localConnectionString in wrangler.jsonc; production requires your Hyperdrive configuration ID. DATABASE_MIGRATION_URL is only for migrations.",
 		d1: "Cloudflare D1 uses the DB binding in wrangler.jsonc. db:migrate applies local migrations; db:migrate:remote applies them to the configured Cloudflare database.",
-		"turso-cloud":
-			"Turso Cloud uses a remote database. Set TURSO_DATABASE_URL (libsql:// or https://) and TURSO_AUTH_TOKEN from your Turso database before running migrations or starting the app. This option never opens a local SQLite file. Database service tests use an isolated local libSQL fixture; they do not access your cloud database.",
+		"turso-cloud": `Turso Cloud develops locally without cloud credentials. ${selection.deployment === "cloudflare" ? "Workers connect to http://127.0.0.1:8080 through the official Turso CLI local server, which persists data in .local/turso-local.db." : "TURSO_DATABASE_URL defaults to file:.local/turso-local.db; the directory is created automatically."} For production, set a remote TURSO_DATABASE_URL (libsql:// or https://) and TURSO_AUTH_TOKEN in .env.prod. Apply cloud migrations with bun run db:migrate:remote; this command reads only .env.prod. Local files and sidecars are ignored by Git. Database service tests use an isolated local libSQL fixture. See [Turso local development](https://docs.turso.tech/local-development).`,
 		"turso-local":
-			"Turso Local uses @libsql/client with a file: URL (TURSO_DATABASE_URL=file:local.db). No Turso Cloud token is required. Keep the database file on persistent storage when deploying.",
+			"Turso Local uses @libsql/client with TURSO_DATABASE_URL=file:.local/turso-local.db by default. The directory is created automatically; no Turso Cloud token is required. Local files and sidecars are ignored by Git. Set a file: URL on persistent storage when deploying. See [Turso local development](https://docs.turso.tech/local-development).",
 		"bun-sqlite":
 			"Bun SQLite uses the native bun:sqlite driver, with SQLITE_DATABASE_PATH=local.db. Run the app with Bun and keep the database file on persistent storage. Native database tests run with bun test after Vitest.",
 	};
@@ -155,6 +154,8 @@ cp .env.example .env
 
 Configure the selected database and provider credentials in \`.env\`, then run:
 
+${selection.database === "turso-cloud" && selection.deployment === "cloudflare" ? "Install the [Turso CLI](https://docs.turso.tech/cli/installation), then run `bun run db:up` in a separate terminal and leave it running. It starts `turso dev --db-file .local/turso-local.db`. No Turso login or cloud token is needed. If port 8080 is occupied, run `bun run db:up --port 8081` and set `TURSO_DATABASE_URL=http://127.0.0.1:8081` in .env.\n" : ""}
+
 \`\`\`sh
 ${isPostgres(selection.database) ? "bun run db:up\nbun run db:migrate" : "bun run db:migrate"}
 bun run dev
@@ -176,7 +177,7 @@ bun run test:unit
 
 Set a new \`BETTER_AUTH_SECRET\` and real application origins. Configure the selected database and verified email sender. ${selection.payments.length ? `Selected payment webhooks: ${selection.payments.map((provider) => `\`/api/webhooks/${provider}\``).join(", ")}. Set their matching signature secrets and register these URLs with the providers.` : "No payment providers or webhook routes were selected."}
 
-${selection.deployment === "cloudflare" ? `Configure the selected resources in \`wrangler.jsonc\`, authenticate with \`bunx wrangler login\`, create \`.env.prod\`, and run \`bun run deploy\`. ${selection.database === "d1" ? "Create the hosted D1 database, replace its placeholder ID, and apply hosted migrations with `bun run db:migrate:remote` before deployment." : "Apply `bun run db:migrate` with production migration credentials before deployment."}${selection.database === "pg-hyperdrive" ? " Set a real Hyperdrive configuration ID and app-role connection credentials." : ""}` : "Inject production environment variables in the hosting environment, apply database migrations, run `bun run deploy` for validation and build checks, then `bun run start`."}
+${selection.deployment === "cloudflare" ? `Configure the selected resources in \`wrangler.jsonc\`, authenticate with \`bunx wrangler login\`, create \`.env.prod\`, and run \`bun run deploy\`. ${selection.database === "d1" ? "Create the hosted D1 database, replace its placeholder ID, and apply hosted migrations with `bun run db:migrate:remote` before deployment." : selection.database === "turso-cloud" ? "Apply `bun run db:migrate:remote` using .env.prod before deployment." : "Apply `bun run db:migrate` with production migration credentials before deployment."}${selection.database === "pg-hyperdrive" ? " Set a real Hyperdrive configuration ID and app-role connection credentials." : ""}` : "Inject production environment variables in the hosting environment, apply database migrations, run `bun run deploy` for validation and build checks, then `bun run start`."}
 
 ${!isPostgres(selection.database) ? `SQLite payments commit a durable \`purchase_delivery\` event atomically with the paid state, using ${selection.database === "bun-sqlite" ? "a synchronous Bun SQLite transaction" : "the driver's atomic batch"}. Implement product fulfillment by consuming these events using \`purchase_id\` as the idempotency key. SQLite authorization uses authenticated/admin middleware and explicit ownership predicates.\n` : ""}
 `;

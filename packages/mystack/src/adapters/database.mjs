@@ -278,14 +278,42 @@ export default defineConfig({ out: "./drizzle", schema: "./src/db/schema.ts", di
 
 async function configureTurso({ files, pkg, selection }) {
 	const cloud = selection.database === "turso-cloud";
+	const worker = selection.deployment === "cloudflare";
+	const localUrl = worker
+		? "http://127.0.0.1:8080"
+		: "file:.local/turso-local.db";
+	const urlPattern = cloud
+		? worker
+			? "/^(?:(?:libsql|https):\\/\\/[^\\s]+|http:\\/\\/(?:127\\.0\\.0\\.1|localhost):\\d+\\/?)$/"
+			: "/^(?:(?:libsql|https):\\/\\/[^\\s]+|file:.+)$/"
+		: "/^file:.+$/";
+	const urlSchema = `z.string().regex(${urlPattern}).default("${localUrl}")`;
 	pkg.dependencies["@libsql/client"] = "^0.17.0";
 	files.set(
+		"src/db/turso-config.ts",
+		`${worker ? "" : 'import { mkdirSync } from "node:fs";\nimport { dirname } from "node:path";\n'}import { z } from "zod";
+export function getTursoConfig(url?: string${cloud ? ", authToken?: string" : ""}) {
+	const databaseUrl = ${urlSchema}.parse(url);
+${
+	cloud
+		? `\tif (/^(libsql|https):\\/\\//.test(databaseUrl)) {
+\t\tif (!authToken?.trim()) throw new Error("Set TURSO_AUTH_TOKEN when connecting to Turso Cloud.");
+\t\treturn { url: databaseUrl, authToken };
+\t}
+`
+		: ""
+}${worker ? "" : '\tif (databaseUrl.startsWith("file:")) mkdirSync(dirname(databaseUrl.slice(5)), { recursive: true });\n'}	return { url: databaseUrl };
+}
+`,
+	);
+	files.set(
 		"src/db/index.ts",
-		`import { createClient } from "${selection.deployment === "cloudflare" ? "@libsql/client/web" : "@libsql/client"}";
+		`import { createClient } from "${worker ? "@libsql/client/web" : "@libsql/client"}";
 import { drizzle } from "drizzle-orm/libsql";
 import * as schema from "./schema";
-export function createDB(url: string${cloud ? ", authToken: string" : ""}) {
-	return drizzle(createClient({ url${cloud ? ", authToken" : ""} }), { schema });
+import { getTursoConfig } from "./turso-config";
+export function createDB(url?: string${cloud ? ", authToken?: string" : ""}) {
+	return drizzle(createClient(getTursoConfig(url${cloud ? ", authToken" : ""})), { schema });
 }
 export type Database = ReturnType<typeof createDB>;
 `,
@@ -308,24 +336,25 @@ export const databaseMiddleware = createMiddleware().server(({ next }) => {
 		"\t\t\tAPP_ORIGIN: z.url(),",
 		`${
 			cloud
-				? '\t\t\tTURSO_DATABASE_URL: z.string().regex(/^(libsql|https):\\/\\//, "Use a remote Turso Cloud URL"),\n\t\t\tTURSO_AUTH_TOKEN: z.string().min(1),'
-				: '\t\t\tTURSO_DATABASE_URL: z.string().startsWith("file:"),'
+				? `\t\t\tTURSO_DATABASE_URL: ${urlSchema},\n\t\t\tTURSO_AUTH_TOKEN: z.string().min(1).optional(),`
+				: `\t\t\tTURSO_DATABASE_URL: ${urlSchema},`
 		}\n\t\t\tAPP_ORIGIN: z.url(),`,
 	);
 	files.set(
 		".env.example",
 		`${text(files, ".env.example")}\n${
 			cloud
-				? "# Turso Cloud: copy the URL and token from your Turso database.\nTURSO_DATABASE_URL=libsql://your-database.turso.io\nTURSO_AUTH_TOKEN=replace-with-your-turso-auth-token"
-				: "# Turso Local: a local libSQL file; no cloud credentials required.\nTURSO_DATABASE_URL=file:local.db"
+				? `# Local development: no Turso Cloud credentials required.${worker ? " Start bun run db:up first." : ""}\nTURSO_DATABASE_URL=${localUrl}\nTURSO_AUTH_TOKEN=\n# Production (.env.prod): set your remote URL and token.\n# TURSO_DATABASE_URL=libsql://your-database.turso.io\n# TURSO_AUTH_TOKEN=replace-with-your-turso-auth-token`
+				: `# Turso Local: a local libSQL file; no cloud credentials required.\nTURSO_DATABASE_URL=${localUrl}`
 		}\n`,
 	);
 	files.set(
 		"drizzle.config.ts",
 		`import { config } from "dotenv";
 import { defineConfig } from "drizzle-kit";
+import { getTursoConfig } from "./src/db/turso-config";
 config({ path: ".env" }); config({ path: ".env.local", override: true });
-export default defineConfig({ out: "./drizzle", schema: "./src/db/schema.ts", dialect: "turso", dbCredentials: { url: process.env.TURSO_DATABASE_URL ?? "${cloud ? "" : "file:local.db"}"${cloud ? ", authToken: process.env.TURSO_AUTH_TOKEN" : ""} } });
+export default defineConfig({ out: "./drizzle", schema: "./src/db/schema.ts", dialect: "turso", dbCredentials: getTursoConfig(process.env.TURSO_DATABASE_URL${cloud ? ", process.env.TURSO_AUTH_TOKEN" : ""}) });
 `,
 	);
 	files.set(
@@ -335,17 +364,22 @@ export default defineConfig({ out: "./drizzle", schema: "./src/db/schema.ts", di
 	pkg.scripts["db:migrate"] = "bun scripts/migrate-turso.ts";
 	files.set(
 		"scripts/migrate-turso.ts",
-		`import { createClient } from "@libsql/client";
-import { drizzle } from "drizzle-orm/libsql";
+		`${cloud ? 'import { readFile } from "node:fs/promises";\nimport { parse } from "dotenv";\n' : ""}import { createDB } from "../src/db";
 import { migrate } from "drizzle-orm/libsql/migrator";
-const url = process.env.TURSO_DATABASE_URL;
-if (!url${cloud ? " || !/^(libsql|https):\\/\\//.test(url) || !process.env.TURSO_AUTH_TOKEN" : ' || !url.startsWith("file:")'}) throw new Error("${cloud ? "Set a remote TURSO_DATABASE_URL and TURSO_AUTH_TOKEN" : "Set a file: TURSO_DATABASE_URL"} in .env before running migrations.");
-const client = createClient({ url${cloud ? ", authToken: process.env.TURSO_AUTH_TOKEN" : ""} });
-try { await migrate(drizzle(client), { migrationsFolder: "./drizzle" }); }
-finally { client.close(); }
+${
+	cloud
+		? `const remote = process.argv.includes("--remote");
+const values = remote ? parse(await readFile(".env.prod", "utf8")) : process.env;
+if (remote && !/^(libsql|https):\\/\\//.test(values.TURSO_DATABASE_URL ?? "")) throw new Error("Set a remote TURSO_DATABASE_URL in .env.prod before running cloud migrations.");
+`
+		: "const values = process.env;\n"
+}const db = createDB(values.TURSO_DATABASE_URL${cloud ? ", values.TURSO_AUTH_TOKEN" : ""});
+try { await migrate(db, { migrationsFolder: "./drizzle" }); }
+finally { db.$client.close(); }
 `,
 	);
 	if (cloud) {
+		pkg.scripts["db:migrate:remote"] = "bun scripts/migrate-turso.ts --remote";
 		replace(
 			files,
 			"scripts/validate-prod-env.ts",
@@ -357,6 +391,25 @@ finally { client.close(); }
 			"scripts/validate-prod-env.ts",
 			"\tBETTER_AUTH_SECRET:",
 			'\tTURSO_AUTH_TOKEN: "replace-with-your-turso-auth-token",\n\tTURSO_DATABASE_URL: "libsql://your-database.turso.io",\n\tBETTER_AUTH_SECRET:',
+		);
+		replace(
+			files,
+			"scripts/validate-prod-env.ts",
+			"\treturn values;",
+			'\tif (!/^(libsql|https):\\/\\//.test(values.TURSO_DATABASE_URL)) throw new Error("Production Turso Cloud requires a remote TURSO_DATABASE_URL.");\n\treturn values;',
+		);
+	}
+	if (worker) {
+		pkg.scripts["db:up"] = "bun scripts/turso-dev.ts";
+		files.set(
+			"scripts/turso-dev.ts",
+			`import { spawnSync } from "node:child_process";
+import { mkdirSync } from "node:fs";
+mkdirSync(".local", { recursive: true });
+const child = spawnSync("turso", ["dev", "--db-file", ".local/turso-local.db", ...process.argv.slice(2)], { stdio: "inherit" });
+if (child.error) throw child.error;
+process.exit(child.status ?? 1);
+`,
 		);
 	}
 	files.set(
