@@ -6,6 +6,7 @@ import {
 	readdir,
 	readFile,
 	rm,
+	symlink,
 	writeFile,
 } from "node:fs/promises";
 import { tmpdir } from "node:os";
@@ -158,23 +159,6 @@ test("supported combinations emit the selected runtimes, dependencies and paymen
 							/d1_databases/,
 						);
 					}
-					if (database === "turso-cloud") {
-						assert.match(
-							files.get(".env.example").toString(),
-							/TURSO_DATABASE_URL=libsql:\/\//,
-						);
-						assert.doesNotMatch(
-							files.get(".env.example").toString(),
-							/file:local.db/,
-						);
-					}
-					if (database === "turso-local") {
-						assert.match(
-							files.get(".env.example").toString(),
-							/TURSO_DATABASE_URL=file:local.db/,
-						);
-					}
-
 					assert.ok(
 						files.has("drizzle/0000_thin_phalanx.sql") || isPostgres(database),
 					);
@@ -229,6 +213,72 @@ test("generation is self-contained and refuses existing directories", async () =
 		await rm(cwd, { recursive: true, force: true });
 	}
 });
+
+test("Turso projects develop without cloud credentials and require remote credentials for production", async () => {
+	const cwd = await mkdtemp(join(tmpdir(), "mystack-turso-"));
+	try {
+		for (const database of ["turso-cloud", "turso-local"])
+			for (const deployment of ["cloudflare", "nitro", "bun"]) {
+				if (database === "turso-local" && deployment === "cloudflare") continue;
+				const target = await createProject({
+					name: `${database}-${deployment}`,
+					selection: { database, deployment, email: "resend", payments: [] },
+					cwd,
+					templateRoot,
+				});
+				await symlink(
+					join(templateRoot, "node_modules"),
+					join(target, "node_modules"),
+					"dir",
+				);
+				await writeFile(
+					join(target, ".env"),
+					await readFile(join(target, ".env.example")),
+				);
+				await writeFile(
+					join(target, "verify-turso.ts"),
+					`import assert from "node:assert/strict";
+import { existsSync } from "node:fs";
+import { writeFile } from "node:fs/promises";
+import { getEnv } from "./src/env";
+import { getTursoConfig } from "./src/db/turso-config";
+import { validateProductionEnv } from "./scripts/validate-prod-env";
+const expectedUrl = "${deployment === "cloudflare" ? "http://127.0.0.1:8080" : "file:.local/turso-local.db"}";
+const env = getEnv();
+assert.equal(env.TURSO_DATABASE_URL, expectedUrl);
+assert.deepEqual(getTursoConfig(), { url: expectedUrl });
+${deployment === "cloudflare" ? 'assert.throws(() => getTursoConfig("file:.local/turso-local.db"));' : 'assert.ok(existsSync(".local"));'}
+${
+	database === "turso-cloud"
+		? `assert.deepEqual(getTursoConfig(env.TURSO_DATABASE_URL, env.TURSO_AUTH_TOKEN), { url: expectedUrl });
+assert.deepEqual(getTursoConfig(expectedUrl, "unused-cloud-token"), { url: expectedUrl });
+assert.throws(() => getTursoConfig("libsql://production.turso.io"), /TURSO_AUTH_TOKEN/);
+assert.throws(() => getTursoConfig("libsql://production.turso.io", " "), /TURSO_AUTH_TOKEN/);
+assert.deepEqual(getTursoConfig("libsql://production.turso.io", "test-token"), { url: "libsql://production.turso.io", authToken: "test-token" });
+const production = { APP_ORIGIN: "https://example.com", BETTER_AUTH_URL: "https://example.com", BETTER_AUTH_SECRET: "production-secret-for-tests", EMAIL_FROM: "test@example.com", EMAIL_FROM_NAME: "Tests", RESEND_API_KEY: "test-resend-key", TURSO_DATABASE_URL: expectedUrl, TURSO_AUTH_TOKEN: "test-token" };
+const saveProduction = () => writeFile(".env.prod", Object.entries(production).map(([key, value]) => key + "=" + value).join("\\n"));
+await saveProduction();
+await assert.rejects(validateProductionEnv(), /remote TURSO_DATABASE_URL/);
+production.TURSO_DATABASE_URL = "libsql://production.turso.io";
+production.TURSO_AUTH_TOKEN = "";
+await saveProduction();
+await assert.rejects(validateProductionEnv(), /TURSO_AUTH_TOKEN/);
+production.TURSO_AUTH_TOKEN = "test-token";
+await saveProduction();
+assert.deepEqual(await validateProductionEnv(), production);
+`
+		: 'assert.throws(() => getTursoConfig("libsql://production.turso.io"));'
+}
+`,
+				);
+				await promisify(execFile)("bun", ["run", "verify-turso.ts"], {
+					cwd: target,
+				});
+			}
+	} finally {
+		await rm(cwd, { recursive: true, force: true });
+	}
+}, 30_000);
 
 test("database choices distinguish connections and disable unavailable runtimes", () => {
 	for (const [database, deployments] of [

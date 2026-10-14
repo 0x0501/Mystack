@@ -25,11 +25,11 @@ The executable runs on Node 22.12+. Generated projects use Bun to install depend
 | PostgreSQL | `pg` | Direct app-role `DATABASE_URL` | Nitro, Bun |
 | PostgreSQL (Hyperdrive) | `pg-hyperdrive` | Cloudflare `HYPERDRIVE` binding | Cloudflare Workers |
 | Cloudflare D1 | `d1` | Cloudflare `DB` binding | Cloudflare Workers |
-| Turso Cloud | `turso-cloud` | Remote `TURSO_DATABASE_URL` and required `TURSO_AUTH_TOKEN` | All |
-| Turso Local (libSQL) | `turso-local` | `TURSO_DATABASE_URL=file:local.db`, no cloud token | Nitro, Bun |
+| Turso Cloud | `turso-cloud` | Local development in `.local/turso-local.db`; remote URL and token in production | All |
+| Turso Local (libSQL) | `turso-local` | `TURSO_DATABASE_URL=file:.local/turso-local.db`, no cloud token | Nitro, Bun |
 | Bun SQLite | `bun-sqlite` | Native `bun:sqlite`, `SQLITE_DATABASE_PATH=local.db` | Bun |
 
-The default is PostgreSQL (Hyperdrive) with Cloudflare Workers. PostgreSQL migrations use the privileged `DATABASE_MIGRATION_URL`; runtime connections use the app role. Turso Cloud accepts remote `libsql://` or `https://` URLs and requires cloud credentials before migration and startup. Local databases need persistent file storage in production; generated projects ignore database files and their WAL sidecars in Git.
+The default is PostgreSQL (Hyperdrive) with Cloudflare Workers. PostgreSQL migrations use the privileged `DATABASE_MIGRATION_URL`; runtime connections use the app role. Both Turso variants develop locally without cloud credentials. Nitro/Bun open `file:.local/turso-local.db` directly and create its directory automatically. Turso Cloud on Workers uses the [official Turso CLI local server](https://docs.turso.tech/local-development): install the CLI and keep `bun run db:up` running in a separate terminal. It serves `http://127.0.0.1:8080` and persists data with `turso dev --db-file .local/turso-local.db`. Turso Cloud production requires a remote `libsql://` or `https://` URL and token in `.env.prod`; `bun run db:migrate:remote` reads that file for cloud migrations. Local databases need persistent file storage in production; generated projects ignore `.local/`, database files and their WAL sidecars in Git.
 
 ```sh
 bunx @0x0501/mystack@latest create cloud-app --database turso-cloud

@@ -30,8 +30,8 @@ The name must start with a lowercase letter and contain at most 58 lowercase let
 | `pg` | `nitro`, `bun` | Docker PostgreSQL; app-role `DATABASE_URL` and privileged `DATABASE_MIGRATION_URL` |
 | `pg-hyperdrive` | `cloudflare` | Docker PostgreSQL; local Hyperdrive connection in `wrangler.jsonc`; privileged migration URL |
 | `d1` | `cloudflare` | Local D1 through Wrangler; no hosted database needed for local migrations |
-| `turso-cloud` | All | Remote `TURSO_DATABASE_URL` and `TURSO_AUTH_TOKEN` |
-| `turso-local` | `nitro`, `bun` | `TURSO_DATABASE_URL=file:local.db` |
+| `turso-cloud` | All | Local `.local/turso-local.db`, no token; Workers require `bun run db:up` (Turso CLI) |
+| `turso-local` | `nitro`, `bun` | `TURSO_DATABASE_URL=file:.local/turso-local.db`, directory created automatically |
 | `bun-sqlite` | `bun` | `SQLITE_DATABASE_PATH=local.db` |
 
 Cloudflare Email requires `cloudflare`; use Resend for Nitro or Bun. Only PostgreSQL variants include PostgreSQL RLS. SQLite variants use server authorization and explicit ownership predicates.
@@ -67,6 +67,8 @@ bun run db:up
 
 All configurations ship initial migrations. Apply them and start development:
 
+For Turso Cloud on Workers, install the [Turso CLI](https://docs.turso.tech/cli/installation) and keep `bun run db:up` running in another terminal first. It starts the official local libSQL server at `http://127.0.0.1:8080`, persisting data in `.local/turso-local.db`. Nitro/Bun Turso projects open the file directly. Neither method needs a cloud account or token; `.local/` is ignored by Git. See [Turso local development](https://docs.turso.tech/local-development).
+
 ```sh
 bun run db:migrate
 bun run dev
@@ -80,9 +82,9 @@ The generated README describes your database and deployment. Its [project guide]
 
 Set a fresh `BETTER_AUTH_SECRET`, real app/auth origins, verified email sender and selected provider credentials. Register only the selected payment webhook URLs and configure their signature secrets. Replace local database credentials with production credentials.
 
-For Workers, provision the selected Hyperdrive or D1 resource, replace its placeholder ID in `wrangler.jsonc`, and configure the email binding if selected. Authenticate with `bunx wrangler login`. D1 projects apply hosted migrations using `bun run db:migrate:remote`; PostgreSQL and Turso Cloud use `bun run db:migrate` with production migration credentials. Create `.env.prod` and run `bun run deploy`.
+For Workers, provision the selected Hyperdrive or D1 resource, replace its placeholder ID in `wrangler.jsonc`, and configure the email binding if selected. Authenticate with `bunx wrangler login`. D1 projects apply hosted migrations using `bun run db:migrate:remote`; PostgreSQL uses `bun run db:migrate` with production migration credentials. Turso Cloud requires a remote `TURSO_DATABASE_URL` and `TURSO_AUTH_TOKEN` in `.env.prod`; apply cloud migrations with `bun run db:migrate:remote`. Create `.env.prod` and run `bun run deploy`.
 
-Migration commands do not automatically read `.env.prod`. PostgreSQL migration tooling loads `.env` and `.env.local` (which overrides existing values); Turso/Bun migration scripts use the process environment (Bun also loads `.env`). Configure the migration environment for the production target before running the command. `bun run deploy` does not apply migrations.
+Turso Cloud's `db:migrate:remote` reads only `.env.prod` and rejects local URLs. Other migration commands do not automatically read `.env.prod`. PostgreSQL migration tooling loads `.env` and `.env.local` (which overrides existing values); local Turso/Bun migration scripts use the process environment (Bun also loads `.env`). Configure the migration environment for the production target before running the command. `bun run deploy` does not apply migrations.
 
 For Nitro or Bun, inject the production environment in your host, apply migrations against the production database, run `bun run deploy` for production validation and build checks, then `bun run start`. Local libSQL and Bun SQLite deployments need persistent storage for the database file and its sidecars.
 
