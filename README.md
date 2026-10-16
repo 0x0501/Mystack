@@ -53,12 +53,24 @@ The default is PostgreSQL + Hyperdrive, Workers, Cloudflare Email and Stripe. Th
 | Path | Purpose |
 |---|---|
 | Root `src/`, `scripts/`, `drizzle/`, app config | Single runnable reference template, maintained and tested directly |
+| `packages/website/` | Independent Mystack marketing site and catalog-backed stack configurator |
 | `packages/mystack/src/` | CLI, option catalog and configuration adapters |
 | `packages/mystack/assets/` | Alternative source files, schemas, migrations and database test harnesses |
 | `packages/mystack/template/` | Ignored release snapshot, rebuilt by `prepack` |
 | `docs/` | User tutorials, contributor guidance, decisions and research |
 
 The root application is the canonical template source. See [ADR 0012](./docs/adr/0012-mystack-project-generation.md) for composition and the decision to keep one source instead of adding an `examples/` or duplicate `templates/default/` application.
+
+## Mystack website
+
+The standalone TanStack Start website lives in [packages/website](./packages/website/README.md). It is separate from the generated application template.
+
+```sh
+bun install --cwd packages/website
+bun run --cwd packages/website dev
+```
+
+Open **http://localhost:3100**. `bun run --cwd packages/website build` creates the client and SSR bundles. Run `bun run --cwd packages/website start` to serve the production site.
 
 ## Documentation
 

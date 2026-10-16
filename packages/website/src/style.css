@@ -1,0 +1,1004 @@
+@font-face {
+	font-family: "Hanken Grotesk";
+	src: url("/fonts/hanken-400.ttf") format("truetype");
+	font-weight: 400;
+	font-display: swap;
+}
+@font-face {
+	font-family: "Hanken Grotesk";
+	src: url("/fonts/hanken-500.ttf") format("truetype");
+	font-weight: 500;
+	font-display: swap;
+}
+:root {
+	--ground: #10110f;
+	--surface: #191a17;
+	--raised: #24251f;
+	--ink: #eeede7;
+	--secondary: #b5b3a7;
+	--accent: #d6c69c;
+	--pad: clamp(24px, 5.5vw, 100px);
+	--body: 18px;
+	--small: 14px;
+	--heading: clamp(46px, 5.4vw, 82px);
+	--ease: cubic-bezier(0.22, 1, 0.36, 1);
+	font-family: "Hanken Grotesk", sans-serif;
+	color: var(--ink);
+	background: var(--ground);
+	font-synthesis: none;
+}
+* {
+	box-sizing: border-box;
+}
+html {
+	scroll-behavior: smooth;
+	scroll-padding-top: 35px;
+}
+body {
+	margin: 0;
+	font-size: var(--body);
+	line-height: 1.55;
+}
+a {
+	color: inherit;
+	text-decoration: none;
+	text-underline-offset: 6px;
+}
+button,
+input {
+	font: inherit;
+}
+button {
+	cursor: pointer;
+	border: 0;
+}
+button,
+a,
+label {
+	-webkit-tap-highlight-color: transparent;
+}
+:focus-visible {
+	outline: 2px solid var(--accent);
+	outline-offset: 5px;
+}
+::selection {
+	color: var(--ground);
+	background: var(--accent);
+}
+h1,
+h2,
+h3,
+p,
+figure {
+	margin: 0;
+}
+h1,
+h2,
+h3 {
+	font-weight: 500;
+	text-wrap: balance;
+	letter-spacing: -0.045em;
+	line-height: 1.05;
+}
+h1 {
+	font-size: var(--heading);
+}
+h2 {
+	font-size: clamp(36px, 3.5vw, 54px);
+}
+h3 {
+	font-size: 28px;
+	line-height: 1.2;
+}
+p {
+	text-wrap: pretty;
+}
+pre {
+	margin: 0;
+	white-space: pre-wrap;
+	overflow-wrap: anywhere;
+	font-size: var(--small);
+	line-height: 1.9;
+}
+code {
+	font-family: monospace;
+}
+.site-shell {
+	position: relative;
+	isolation: isolate;
+	overflow: clip;
+}
+.masthead,
+.navigation,
+main,
+.site-footer {
+	position: relative;
+	z-index: 1;
+}
+.mechanical-world {
+	position: fixed;
+	inset: 0;
+	overflow: hidden;
+	pointer-events: none;
+	z-index: 0;
+}
+
+.mechanical-canvas {
+	position: absolute;
+	inset: 0;
+	width: 100%;
+	height: 100%;
+	opacity: 0;
+}
+.mechanical-poster {
+	position: absolute;
+	left: 34%;
+	top: 12%;
+	width: 68%;
+	height: 80%;
+	object-fit: contain;
+	opacity: 0.8;
+}
+.mechanical-world[data-renderer="webgl"] .mechanical-canvas {
+	opacity: 0.9;
+}
+:where(.mechanical-world[data-renderer="webgl"]) .mechanical-poster {
+	visibility: hidden;
+}
+.art-left .mechanical-poster {
+	left: -4%;
+}
+.scene-note {
+	position: fixed;
+	z-index: 1;
+	bottom: 28px;
+	width: 310px;
+	padding: 14px;
+	background: rgb(16 17 15 / 0.94);
+	font-size: 14px;
+	pointer-events: none;
+}
+.note-right {
+	right: 5vw;
+}
+.note-left {
+	left: 5vw;
+}
+.scene-note strong {
+	font-size: 18px;
+	font-weight: 500;
+}
+.scene-note p {
+	margin-top: 7px;
+	color: var(--secondary);
+}
+.mechanism-phase {
+	display: block;
+	margin-top: 12px;
+	color: var(--accent);
+}
+.mechanism-description {
+	display: none;
+}
+.art-left
+	main
+	> :is(
+		.page-heading,
+		.chapter,
+		.foundation-overview,
+		.quick-layout,
+		.docs-index,
+		.docs-layout
+	) {
+	margin-left: auto;
+}
+.skip-link {
+	position: absolute;
+	top: 15px;
+	left: 20px;
+	width: 0;
+	height: 0;
+	padding: 0;
+	overflow: hidden;
+	z-index: 10;
+	background: var(--accent);
+	color: var(--ground);
+}
+.skip-link:focus {
+	width: auto;
+	height: auto;
+	padding: 12px;
+}
+.masthead {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 30px;
+	padding: 28px var(--pad) 20px;
+}
+.wordmark {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	font-size: 43px;
+	font-weight: 500;
+	letter-spacing: -0.075em;
+	line-height: 1;
+}
+.wordmark svg {
+	width: 30px;
+}
+.masthead p {
+	margin-left: auto;
+	color: var(--secondary);
+	font-size: var(--small);
+	line-height: 1.35;
+}
+.masthead > a:last-child {
+	margin-left: 40px;
+	font-size: var(--small);
+}
+.navigation {
+	display: flex;
+	gap: 35px;
+	padding: 18px var(--pad);
+}
+.navigation a {
+	font-size: var(--body);
+	padding: 8px 0;
+}
+.navigation small {
+	display: none;
+}
+.navigation .is-active {
+	color: var(--accent);
+	text-decoration: underline;
+}
+.button {
+	display: inline-flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 32px;
+	min-height: 56px;
+	padding: 15px 23px;
+	background: var(--accent);
+	color: var(--ground);
+	font-weight: 500;
+	transition: transform 180ms var(--ease);
+}
+.button:active {
+	transform: scale(0.97);
+}
+.button > span {
+	font-size: 28px;
+	line-height: 1;
+}
+.text-link {
+	display: inline-block;
+	text-decoration: underline;
+	margin-top: 25px;
+}
+.small-note {
+	color: var(--secondary);
+	font-size: var(--small);
+}
+main {
+	padding: 0 var(--pad);
+}
+.home-hero {
+	min-height: 76svh;
+	display: flex;
+	align-items: center;
+}
+.hero-copy {
+	width: min(47%, 650px);
+	padding: 35px 0 80px;
+}
+.hero-copy h1 {
+	background: var(--ground);
+	width: fit-content;
+	font-size: clamp(64px, 7vw, 108px);
+}
+.hero-copy > p {
+	background: rgb(16 17 15 / 0.94);
+	max-width: 430px;
+	margin: 32px 0;
+}
+.hero-copy .small-note {
+	display: block;
+	width: fit-content;
+	background: var(--ground);
+	margin-top: 40px;
+}
+.foundation-strip {
+	display: flex;
+	flex-direction: column;
+	gap: 20px;
+	width: min(48%, 650px);
+	padding: 30px 0;
+}
+.foundation-strip > span {
+	font-size: var(--small);
+	color: var(--secondary);
+}
+.foundation-strip > div {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 12px 26px;
+}
+.chapter {
+	margin-top: 160px;
+}
+.chapter,
+.foundation-overview,
+.quick-layout,
+.docs-index,
+.integration-layout {
+	width: min(48%, 680px);
+}
+.section-heading,
+.page-heading {
+	display: flex;
+	flex-direction: column;
+	align-items: start;
+	gap: 30px;
+}
+.page-heading {
+	padding: 65px 0 75px;
+	width: min(49%, 700px);
+}
+.page-heading > div {
+	max-width: 530px;
+}
+.section-heading {
+	margin-bottom: 35px;
+}
+.section-heading p {
+	max-width: 440px;
+}
+.story-copy,
+.home-foundation,
+.home-start,
+.docs-invitation,
+.foundation-overview,
+.foundation-detail,
+.next-step,
+.docs-note {
+	background: rgb(16 17 15 / 0.94);
+}
+.story-copy p,
+.home-foundation p,
+.foundation-overview p,
+.foundation-detail p,
+.docs-invitation p {
+	margin-top: 25px;
+}
+:where(.home-foundation, .foundation-detail) .code-block {
+	margin-top: 32px;
+}
+.home-start > div:first-child {
+	padding-bottom: 32px;
+}
+.home-start p,
+.next-step p,
+.docs-note p {
+	margin: 25px 0;
+}
+.code-block,
+.command-output {
+	padding: 25px;
+	background: var(--surface);
+	min-width: 0;
+}
+.code-caption {
+	font-size: var(--small);
+	color: var(--secondary);
+	margin-bottom: 22px;
+}
+.integration-layout {
+	width: min(44%, 650px);
+}
+.integration-controls {
+	padding: 0;
+	background: rgb(16 17 15 / 0.97);
+}
+.stack-builder fieldset {
+	border: 0;
+	margin: 0 0 38px;
+	padding: 0;
+	min-width: 0;
+}
+.stack-builder legend {
+	display: flex;
+	width: 100%;
+	align-items: baseline;
+	justify-content: space-between;
+	gap: 16px;
+	margin-bottom: 17px;
+	font-size: 28px;
+}
+.stack-builder :where(legend) span {
+	font-size: var(--small);
+	color: var(--secondary);
+}
+.options {
+	display: grid;
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+	gap: 8px;
+}
+.option {
+	position: relative;
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	min-height: 72px;
+	padding: 12px;
+	background: var(--surface);
+	font-size: 15px;
+	cursor: pointer;
+	transition: transform 180ms var(--ease);
+}
+.option input {
+	width: 14px;
+	height: 14px;
+	margin: 0;
+	flex-shrink: 0;
+	accent-color: var(--accent);
+}
+.option:has(input:checked) {
+	background: #34352c;
+	color: var(--ink);
+}
+.option:has(input:disabled) {
+	opacity: 0.38;
+	cursor: not-allowed;
+}
+.option-art {
+	width: 46px;
+	height: 50px;
+	flex-shrink: 0;
+}
+.field-note {
+	font-size: var(--small);
+	color: var(--secondary);
+	margin-top: 13px;
+}
+.command-output pre {
+	min-height: 90px;
+}
+.command-output .button {
+	width: 100%;
+	margin-top: 22px;
+}
+.copy-feedback {
+	margin-top: 15px;
+	font-size: var(--small);
+	min-height: 42px;
+}
+.assembly-workbench {
+	margin-top: 35px;
+}
+.assembly-note {
+	margin-bottom: 22px;
+	color: var(--secondary);
+}
+.compatibility-table {
+	overflow-x: auto;
+	padding: 20px;
+	background: var(--surface);
+}
+table {
+	width: 100%;
+	min-width: 650px;
+	border-collapse: collapse;
+	text-align: left;
+	font-size: 14px;
+}
+caption {
+	text-align: left;
+	margin-bottom: 22px;
+	font-size: 18px;
+}
+th,
+td {
+	padding: 14px 12px;
+	border-bottom: 1px solid #45463e;
+}
+th {
+	font-weight: 500;
+}
+thead {
+	background: var(--raised);
+}
+.integration-notes {
+	display: grid;
+	gap: 35px;
+	margin-top: 40px;
+}
+.integration-notes p {
+	margin-top: 16px;
+}
+.quick-machine {
+	margin-bottom: 45px;
+}
+.quick-machine p {
+	color: var(--secondary);
+	font-size: var(--small);
+}
+.quick-steps {
+	padding: 0;
+	margin: 0;
+	list-style: none;
+	display: grid;
+	gap: 90px;
+}
+.quick-steps li {
+	background: rgb(16 17 15 / 0.94);
+}
+.quick-steps h2 {
+	font-size: 42px;
+}
+.quick-steps p {
+	margin-top: 24px;
+}
+.quick-steps .code-block,
+.quick-steps .command-output {
+	margin-top: 28px;
+}
+.docs-intro {
+	padding-bottom: 65px;
+}
+.docs-intro h2 {
+	font-size: 36px;
+}
+.docs-intro p {
+	margin: 25px 0;
+}
+.document-list {
+	display: grid;
+	gap: 36px;
+}
+.document-list a {
+	position: relative;
+	display: block;
+	padding: 30px;
+	background: var(--surface);
+}
+.document-list h2 {
+	font-size: 32px;
+}
+.document-list p {
+	margin-top: 18px;
+	padding-right: 35px;
+}
+.document-list span {
+	position: absolute;
+	bottom: 25px;
+	right: 25px;
+	font-size: 28px;
+}
+.docs-layout {
+	width: min(57%, 820px);
+	padding-top: 50px;
+}
+.docs-sidebar {
+	margin-bottom: 60px;
+}
+.docs-sidebar > .text-link {
+	margin: 0 0 25px;
+	font-size: var(--small);
+	color: var(--secondary);
+}
+.docs-sidebar nav {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 10px 25px;
+}
+.docs-sidebar :where(nav) a {
+	font-size: 15px;
+	padding: 8px 0;
+}
+.docs-sidebar .is-active {
+	color: var(--accent);
+	text-decoration: underline;
+}
+.document header h1 {
+	font-size: clamp(45px, 4.5vw, 70px);
+}
+.document :where(header) p {
+	font-size: 24px;
+	margin-top: 26px;
+	max-width: 600px;
+}
+.document-contents {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 9px;
+	margin: 35px 0 65px;
+}
+.document-contents a {
+	background: var(--surface);
+	padding: 10px 14px;
+	font-size: var(--small);
+}
+.document > section {
+	margin-top: 80px;
+	padding: 6px 0 20px;
+	background: rgb(16 17 15 / 0.94);
+}
+.document h2 {
+	font-size: 34px;
+}
+.document p {
+	margin-top: 23px;
+}
+.document .code-block {
+	margin-top: 28px;
+}
+.document-bottom {
+	display: flex;
+	justify-content: space-between;
+	gap: 20px;
+	margin-top: 70px;
+	padding: 24px;
+	background: var(--surface);
+}
+.site-footer {
+	margin: 180px var(--pad) 0;
+	padding-top: 45px;
+	display: grid;
+	grid-template-columns: 1.4fr 1fr 1fr;
+	gap: 35px;
+	background: var(--ground);
+}
+.site-footer > div:first-child {
+	padding-right: 25px;
+}
+.site-footer h2 {
+	font-size: clamp(36px, 3.5vw, 54px);
+}
+.site-footer p {
+	margin-top: 25px;
+	font-size: var(--small);
+	color: var(--secondary);
+}
+.site-footer nav {
+	display: flex;
+	flex-direction: column;
+	gap: 15px;
+	padding-left: 25px;
+}
+.footer-cta {
+	display: flex;
+	justify-content: space-between;
+	align-items: start;
+	padding: 25px;
+	background: var(--accent);
+	color: var(--ground);
+	font-size: 24px;
+}
+.footer-cta span {
+	align-self: end;
+	font-size: 48px;
+}
+.footer-mark {
+	grid-column: 1 / -1;
+	font-size: 23vw;
+	letter-spacing: -0.075em;
+	font-weight: 500;
+	line-height: 1;
+	padding: 25px 0;
+	overflow: hidden;
+}
+.credits {
+	grid-column: 1 / -1;
+	display: flex;
+	justify-content: space-between;
+	gap: 25px;
+	padding-bottom: 35px;
+	font-size: var(--small);
+	color: var(--secondary);
+}
+.empty-page {
+	padding: 100px 0;
+}
+.empty-page p {
+	margin: 25px 0;
+}
+@media (hover: hover) {
+	a:not(.button):hover {
+		text-decoration: underline;
+	}
+	.button:hover,
+	.option:not(:has(input:disabled)):hover {
+		transform: translateY(-2px);
+	}
+}
+@media (max-width: 1100px) {
+	.site-footer {
+		grid-template-columns: 1fr 1fr;
+	}
+	.site-footer > div:first-child {
+		grid-column: 1 / -1;
+	}
+	:root {
+		--pad: 35px;
+		--body: 17px;
+	}
+
+	.hero-copy {
+		width: 53%;
+	}
+	.chapter,
+	.foundation-overview,
+	.quick-layout,
+	.docs-index,
+	.integration-layout {
+		width: 53%;
+	}
+	.page-heading {
+		width: 56%;
+	}
+
+	.docs-layout {
+		width: 65%;
+	}
+	.option-art {
+		width: 34px;
+	}
+	.option {
+		gap: 7px;
+		padding: 10px;
+		font-size: 14px;
+	}
+}
+@media (max-width: 760px) {
+	:root {
+		--pad: 24px;
+		--heading: 48px;
+	}
+	.masthead {
+		padding-top: 25px;
+		gap: 20px;
+	}
+	.masthead p {
+		display: none;
+	}
+	.masthead > a:last-child {
+		margin-left: auto;
+		font-size: var(--small);
+	}
+	.wordmark {
+		font-size: 36px;
+		gap: 8px;
+	}
+	.wordmark svg {
+		width: 26px;
+	}
+	.navigation {
+		display: grid;
+		grid-template-columns: 1fr 1fr;
+		gap: 6px 24px;
+		padding-top: 12px;
+	}
+	.navigation a {
+		font-size: 14px;
+	}
+
+	.home-hero {
+		min-height: 86svh;
+		align-items: start;
+	}
+	.hero-copy {
+		width: 100%;
+		padding-top: 55px;
+		padding-bottom: 190px;
+	}
+	.hero-copy h1 {
+		font-size: clamp(56px, 12vw, 82px);
+	}
+	.hero-copy > p {
+		max-width: 330px;
+		background: rgb(16 17 15 / 0.9);
+		padding: 10px 0;
+	}
+	.hero-copy .small-note {
+		margin-top: 25px;
+	}
+	.foundation-strip {
+		width: 100%;
+		background: rgb(16 17 15 / 0.94);
+	}
+	.chapter,
+	.foundation-overview,
+	.quick-layout,
+	.docs-index,
+	.integration-layout,
+	.page-heading,
+	.docs-layout {
+		width: 100%;
+	}
+	.page-heading {
+		padding: 50px 0 60px;
+	}
+	.page-heading > div {
+		max-width: 460px;
+		background: rgb(16 17 15 / 0.94);
+	}
+	.chapter {
+		margin-top: 110px;
+	}
+	.section-heading {
+		background: rgb(16 17 15 / 0.94);
+	}
+	.integration-layout {
+		padding-top: 24svh;
+	}
+	.integration-controls {
+		padding-top: 24px;
+	}
+	.option {
+		padding: 12px;
+		font-size: 14px;
+		min-height: 76px;
+	}
+	.option-art {
+		width: 42px;
+	}
+	.stack-builder legend {
+		font-size: 26px;
+	}
+	.stack-builder :where(legend) span {
+		font-size: var(--small);
+	}
+	.assembly-workbench {
+		background: rgb(16 17 15 / 0.94);
+	}
+	.docs-layout {
+		padding-top: 38px;
+	}
+	.docs-sidebar {
+		margin-bottom: 45px;
+		background: rgb(16 17 15 / 0.9);
+	}
+	.document header {
+		padding-bottom: 16px;
+		background: rgb(16 17 15 / 0.9);
+	}
+	.document header h1 {
+		font-size: 45px;
+	}
+	.document :where(header) p {
+		font-size: 22px;
+	}
+	.document h2 {
+		font-size: 30px;
+	}
+	.document-contents {
+		margin-bottom: 90px;
+	}
+	.document > section {
+		margin-top: 75px;
+	}
+	.code-block,
+	.command-output {
+		padding: 22px;
+	}
+	.docs-intro {
+		background: rgb(16 17 15 / 0.94);
+	}
+	.document-list a {
+		padding: 25px;
+	}
+	.document-list h2 {
+		font-size: 30px;
+	}
+	.site-footer {
+		grid-template-columns: 1fr 1fr;
+		margin-top: 130px;
+		gap: 30px;
+	}
+	.site-footer > div:first-child {
+		grid-column: 1 / -1;
+	}
+	.site-footer nav {
+		padding: 0;
+		font-size: var(--body);
+	}
+	.site-footer h2 {
+		font-size: 42px;
+	}
+	.footer-cta {
+		font-size: 20px;
+		padding: 20px;
+	}
+	.footer-mark {
+		font-size: 22vw;
+	}
+	.credits {
+		flex-direction: column;
+		gap: 12px;
+	}
+}
+@media (max-width: 380px) {
+	:root {
+		--pad: 18px;
+	}
+	.option {
+		padding: 10px;
+		gap: 6px;
+	}
+	.option-art {
+		width: 32px;
+	}
+	.document header h1 {
+		font-size: 40px;
+	}
+}
+@media (prefers-reduced-motion: reduce) {
+	html {
+		scroll-behavior: auto;
+	}
+	.button,
+	.option {
+		transition: none;
+	}
+}
+
+@media (max-width: 760px) {
+	.mechanical-poster,
+	.art-left .mechanical-poster {
+		left: -6%;
+		top: 25%;
+		width: 112%;
+		height: 68%;
+	}
+	.scene-note {
+		display: none;
+	}
+	.mechanism-description {
+		display: block;
+		margin-top: 22px;
+		font-size: 14px;
+		color: var(--secondary);
+		background: var(--ground);
+	}
+	.mechanism-description strong {
+		font-weight: 500;
+		color: var(--ink);
+	}
+	.art-left
+		main
+		> :is(
+			.page-heading,
+			.chapter,
+			.foundation-overview,
+			.quick-layout,
+			.docs-index,
+			.docs-layout
+		) {
+		margin-left: 0;
+	}
+}
+
+.document > header,
+.docs-sidebar,
+.page-heading,
+.page-heading > div {
+	background: rgb(16 17 15 / 0.96);
+}
+
+.masthead,
+.navigation {
+	background: rgb(16 17 15 / 0.96);
+}
+.mechanism-phase[hidden] {
+	display: none;
+}
+
+@media (max-width: 760px) {
+	.document .mechanism-description {
+		font-size: 14px;
+		line-height: 1.55;
+	}
+}

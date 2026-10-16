@@ -1,0 +1,95 @@
+import { useEffect, useRef, useState } from "react";
+import model from "../data/machine.json";
+import type {
+	createMechanicalRenderer,
+	StageSelection,
+} from "../lib/mechanical-renderer";
+import { type MechanicalScene, modulesForScene } from "../services/assembly";
+import { mechanismInfo, mechanismPhase } from "../services/mechanics";
+import { useStack } from "./stack-context";
+
+export function MechanicalWorld({
+	scene,
+	side,
+	route,
+}: {
+	scene: MechanicalScene;
+	side: "left" | "right";
+	route: string;
+}) {
+	const { selection } = useStack();
+	const canvas = useRef<HTMLCanvasElement>(null);
+	const phase = useRef<HTMLSpanElement>(null);
+	const renderer = useRef<ReturnType<typeof createMechanicalRenderer> | null>(
+		null,
+	);
+	const [ready, setReady] = useState(false);
+	const ids = modulesForScene(scene, selection);
+	const signature = ids.join("|");
+	const current = useRef<StageSelection>({ scene, side, ids, route });
+	current.current = { scene, side, ids, route };
+
+	useEffect(() => {
+		let disposed = false;
+		import("../lib/mechanical-renderer")
+			.then(({ createMechanicalRenderer }) => {
+				if (disposed || !canvas.current) return;
+				try {
+					renderer.current = createMechanicalRenderer(
+						canvas.current,
+						setReady,
+						(text) => {
+							if (phase.current) phase.current.textContent = text;
+						},
+					);
+					void renderer.current
+						.set(current.current)
+						.catch(() => setReady(false));
+				} catch {
+					setReady(false);
+				}
+			})
+			.catch(() => setReady(false));
+		return () => {
+			disposed = true;
+			renderer.current?.dispose();
+			renderer.current = null;
+		};
+	}, []);
+	useEffect(() => {
+		void renderer.current
+			?.set({ scene, side, route, ids: signature.split("|") })
+			.catch(() => setReady(false));
+	}, [scene, side, route, signature]);
+
+	return (
+		<>
+			<div
+				className={`mechanical-world world-${scene}`}
+				aria-hidden="true"
+				data-scene={scene}
+				data-renderer={ready ? "webgl" : "poster"}
+				data-selection={signature}
+			>
+				<img
+					className="mechanical-poster"
+					src={model.posters[scene]}
+					alt=""
+					width="1200"
+					height="980"
+				/>
+				<canvas className="mechanical-canvas" ref={canvas} />
+			</div>
+			<aside
+				className={`scene-note note-${side}`}
+				aria-label="About the illustration"
+			>
+				<strong>{mechanismInfo[scene].title}.</strong>
+				<p>{mechanismInfo[scene].description}</p>
+				<span ref={phase} hidden={!ready} className="mechanism-phase">
+					{mechanismPhase(scene, 0)}
+				</span>
+			</aside>
+		</>
+	);
+}
