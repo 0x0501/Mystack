@@ -57,7 +57,7 @@ Selections survive client navigation; a fresh visit starts from the reference co
 
 Three.js renders the GLBs with an orthographic camera and a depth buffer. Moving parts rotate as actual 3D bodies with unit scale; no projected SVG is skewed to simulate rotation. Component changes first open the press before withdrawing and inserting fittings. The press uses one slider-crank model, so the connecting rod keeps its length and the platen follows the crank. Paper feeds before contact and exits after the platen lifts. Authentication and configuration have their own ordered mechanisms. The same pure state functions drive movement.
 
-One canvas persists across client routes. The renderer loads on demand, caches loaded assemblies, precompiles shaders, limits pixel ratio, and uses one time-based frame loop for scroll and anime.js assembly timelines. It stops when settled, in a hidden tab, or after the reading area leaves view. Reduced motion renders a still state while preserving provider choices. The server-rendered SVG poster remains visible before WebGL loads, if it is unavailable, or after context loss.
+One canvas persists across client routes. The renderer loads on demand, caches loaded assemblies, precompiles shaders, limits pixel ratio, and uses one time-based frame loop for scroll and anime.js assembly timelines. It stops when settled, in a hidden tab, or after the reading area leaves view. Reduced motion renders a still state while preserving provider choices. The server-rendered SVG poster remains visible before WebGL loads, if it is unavailable, or after context loss. The poster is a frame from the same Blender camera that the generator records in `machine.json`, and its box is computed from the renderer's stage (`src/services/stage.ts`), so the machine keeps its size and position when the canvas fades in over it.
 
 The renderer is a separate deferred bundle (approximately 169 KB gzipped); Vite reports its uncompressed size warning. It is not part of the initial page bundle. Ordinary builds do not require Blender.
 
@@ -82,10 +82,11 @@ Blender 4.5 can also run the script in background mode. The script creates its o
 - `src/lib/mechanical-rig.ts`: rigid transforms applied to the actual model nodes.
 - `src/services/mechanics.ts`: slider-crank, lock, composing and drawer behavior.
 - `src/services/assembly.ts`: catalog-to-fitting selection and route composition.
+- `src/services/stage.ts`: where the machine sits on screen; shared by the canvas camera and the poster's CSS box.
 - `src/services/seo.ts`: page metadata, JSON-LD, sitemap, robots and `llms.txt`.
 - `src/components/stack-context.tsx`, `stack-builder.tsx`, `src/configurator.ts`: shared configuration, accessible native controls and copyable commands.
 - `src/routes/`, `src/data/documentation.ts`: on-site pages and source-backed documentation.
-- `scripts/check-machine.ts`: validates distinct provider geometry, GLBs, edge buffers and static artwork.
+- `scripts/check-machine.ts`: validates distinct provider geometry, GLBs, edge buffers and static artwork, including that each poster's recorded frame matches its SVG.
 - `scripts/check-motion.ts`: loads every real GLB and checks rigid distances across 41 poses; also checks projected axial-edge stability through a complete wheel revolution.
 - `../../src/__tests__/website-*.test.ts`: configuration, linkage and ordering tests; excluded from generated application templates.
 

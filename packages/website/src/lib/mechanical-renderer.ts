@@ -20,6 +20,7 @@ import {
 	assemblyDelay,
 	type MechanicalScene,
 } from "../services/assembly";
+import { cameraOffset, stageLayout, stageView } from "../services/stage";
 import { applyRigPose, type RigNode } from "./mechanical-rig";
 
 export type StageSelection = {
@@ -59,6 +60,7 @@ export function createMechanicalRenderer(
 	const pending = new Map<string, Promise<Assembly>>();
 	const abort = new AbortController();
 	const reduced = matchMedia("(prefers-reduced-motion: reduce)");
+	const narrow = matchMedia("(max-width: 760px)");
 	let settings: StageSelection = {
 		scene: "stack",
 		side: "right",
@@ -179,47 +181,35 @@ export function createMechanicalRenderer(
 	}
 
 	function cameraFrame() {
-		const mobile = width <= 760;
-		const press = settings.scene === "stack" || settings.scene === "deployment";
-		const viewHeight = mobile
-			? press
-				? 10.5
-				: 8.7
-			: press
-				? settings.route === "/integrations"
-					? 12
-					: 10.5
-				: settings.scene === "configuration"
-					? 9.5
-					: settings.scene === "authentication"
-						? 9.5
-						: 7.5;
-		const stageWidth = width * (mobile ? 1.12 : 0.75);
-		const stageHeight = mobile ? height * 0.68 : height;
-		const drift = Math.sin(cycle.value * Math.PI) * width * 0.055;
-		const x = mobile
-			? -width * 0.06
-			: settings.side === "right"
-				? width * 0.34 - drift
-				: -width * 0.15 + drift;
-		const y = mobile ? height * 0.03 : 0;
-		renderer.setViewport(x, y, stageWidth, stageHeight);
+		const mobile = narrow.matches;
+		const { viewHeight, target } = stageView(
+			settings.scene,
+			settings.route,
+			mobile,
+		);
+		const layout = stageLayout(settings.side, mobile);
+		const stageWidth = width * layout.width;
+		const stageHeight = height * layout.height;
+		const drift =
+			(mobile ? 0 : Math.sin(cycle.value * Math.PI) * width * 0.055) *
+			(settings.side === "right" ? -1 : 1);
+		renderer.setViewport(
+			width * layout.x + drift,
+			height * layout.y,
+			stageWidth,
+			stageHeight,
+		);
 		camera.left = (-viewHeight * stageWidth) / stageHeight / 2;
 		camera.right = -camera.left;
 		camera.top = viewHeight / 2;
 		camera.bottom = -camera.top;
-		const target = new Vector3(
-			press ? -0.25 : settings.scene === "authentication" ? -1.5 : 0,
-			press ? 2.4 : settings.scene === "configuration" ? 0.3 : 2,
-			0,
-		);
 		// A small, real camera orbit changes composition without shearing the object.
 		camera.position.set(
-			target.x + 11 + cycle.value * 0.8,
-			target.y + 9,
-			target.z - 15,
+			target[0] + cameraOffset[0] + cycle.value * 0.8,
+			target[1] + cameraOffset[1],
+			target[2] + cameraOffset[2],
 		);
-		camera.lookAt(target);
+		camera.lookAt(...target);
 		camera.updateProjectionMatrix();
 	}
 	function paint() {
@@ -290,10 +280,11 @@ export function createMechanicalRenderer(
 		} else invalidate();
 	}
 	function resize() {
-		width = window.innerWidth;
-		height = window.innerHeight;
+		// The canvas fills the fixed world, the same box the poster is placed in.
+		width = canvas.clientWidth;
+		height = canvas.clientHeight;
 		renderer.setPixelRatio(
-			Math.min(devicePixelRatio, width <= 760 ? 1.25 : 1.5),
+			Math.min(devicePixelRatio, narrow.matches ? 1.25 : 1.5),
 		);
 		renderer.setSize(width, height, false);
 		scroll();

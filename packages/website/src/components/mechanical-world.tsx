@@ -1,10 +1,11 @@
-import { useEffect, useRef, useState } from "react";
+import { type CSSProperties, useEffect, useRef, useState } from "react";
 import model from "../data/machine.json";
 import type {
 	createMechanicalRenderer,
 	StageSelection,
 } from "../lib/mechanical-renderer";
 import { type MechanicalScene, modulesForScene } from "../services/assembly";
+import { posterVariables } from "../services/stage";
 import { useStack } from "./stack-context";
 
 export function MechanicalWorld({
@@ -64,10 +65,9 @@ export function MechanicalWorld({
 		>
 			<img
 				className="mechanical-poster"
-				src={model.posters[scene]}
+				src={model.posters[scene].src}
 				alt=""
-				width="1200"
-				height="980"
+				style={posterVariables(scene, route, side) as CSSProperties}
 			/>
 			<canvas className="mechanical-canvas" ref={canvas} />
 		</div>

@@ -359,8 +359,8 @@ for name,ids in scene_parts.items():
     selected=[p for p in metadata if p['id'] in ids];bb=[min(p['bounds'][0] for p in selected)-35,min(p['bounds'][1] for p in selected)-35,max(p['bounds'][2] for p in selected)+35,max(p['bounds'][3] for p in selected)+35]
     view=f'{bb[0]} {bb[1]} {bb[2]-bb[0]} {bb[3]-bb[1]}'
     (POSTERS/f'{name}.svg').write_text(svg([s for key in ids for s in all_shapes[key]],view))
-    posters[name]=f'/models/posters/{name}.svg'
-(ROOT/'src/data/machine.json').write_text(json.dumps(dict(generator='Blender '+bpy.app.version_string,width=W,height=H,modules=metadata,posters=posters),separators=(',',':')))
+    posters[name]=dict(src=f'/models/posters/{name}.svg',view=[bb[0],bb[1],bb[2]-bb[0],bb[3]-bb[1]])
+(ROOT/'src/data/machine.json').write_text(json.dumps(dict(generator='Blender '+bpy.app.version_string,width=W,height=H,camera=dict(target=[0,2.1,0],offset=[round(x,4) for x in convert(camera.location-Vector((0,0,2.1)))],pixelsPerUnit=W/camera.data.ortho_scale),modules=metadata,posters=posters),separators=(',',':')))
 # The editable source contains the actual mechanism and all alternate fittings.
 defaults=set(scene_parts['stack'])
 for key,entry in modules.items():
