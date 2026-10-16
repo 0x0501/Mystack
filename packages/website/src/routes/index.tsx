@@ -1,8 +1,9 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { CodeBlock, MechanismIntro } from "../components/shell";
+import { CodeBlock } from "../components/shell";
+import { seo, softwareSchema } from "../services/seo";
 
 export const Route = createFileRoute("/")({
-	head: () => ({ meta: [{ title: "Mystack — Your stack, connected" }] }),
+	head: () => seo("/", softwareSchema),
 	component: Home,
 });
 function Home() {
@@ -22,7 +23,6 @@ function Home() {
 					<Link to="/integrations" className="button">
 						Build your stack <span aria-hidden="true">↗</span>
 					</Link>
-					<MechanismIntro />
 					<span className="small-note">
 						Open source. Yours from the first line.
 					</span>

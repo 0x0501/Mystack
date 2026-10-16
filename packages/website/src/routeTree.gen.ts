@@ -13,7 +13,10 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as DocsRouteImport } from './routes/docs'
 import { Route as FoundationRouteImport } from './routes/foundation'
 import { Route as IntegrationsRouteImport } from './routes/integrations'
+import { Route as LlmsDottxtRouteImport } from './routes/llms[.]txt'
 import { Route as QuickStartRouteImport } from './routes/quick-start'
+import { Route as RobotsDottxtRouteImport } from './routes/robots[.]txt'
+import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as DocsIndexRouteImport } from './routes/docs.index'
 import { Route as DocsTopicRouteImport } from './routes/docs.$topic'
 
@@ -37,9 +40,24 @@ const IntegrationsRoute = IntegrationsRouteImport.update({
   path: '/integrations',
   getParentRoute: () => rootRouteImport,
 } as any)
+const LlmsDottxtRoute = LlmsDottxtRouteImport.update({
+  id: '/llms.txt',
+  path: '/llms.txt',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const QuickStartRoute = QuickStartRouteImport.update({
   id: '/quick-start',
   path: '/quick-start',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RobotsDottxtRoute = RobotsDottxtRouteImport.update({
+  id: '/robots.txt',
+  path: '/robots.txt',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
+  id: '/sitemap.xml',
+  path: '/sitemap.xml',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DocsIndexRoute = DocsIndexRouteImport.update({
@@ -58,7 +76,10 @@ export interface FileRoutesByFullPath {
   '/docs': typeof DocsRouteWithChildren
   '/foundation': typeof FoundationRoute
   '/integrations': typeof IntegrationsRoute
+  '/llms.txt': typeof LlmsDottxtRoute
   '/quick-start': typeof QuickStartRoute
+  '/robots.txt': typeof RobotsDottxtRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/docs/$topic': typeof DocsTopicRoute
   '/docs/': typeof DocsIndexRoute
 }
@@ -66,7 +87,10 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/foundation': typeof FoundationRoute
   '/integrations': typeof IntegrationsRoute
+  '/llms.txt': typeof LlmsDottxtRoute
   '/quick-start': typeof QuickStartRoute
+  '/robots.txt': typeof RobotsDottxtRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/docs/$topic': typeof DocsTopicRoute
   '/docs': typeof DocsIndexRoute
 }
@@ -76,7 +100,10 @@ export interface FileRoutesById {
   '/docs': typeof DocsRouteWithChildren
   '/foundation': typeof FoundationRoute
   '/integrations': typeof IntegrationsRoute
+  '/llms.txt': typeof LlmsDottxtRoute
   '/quick-start': typeof QuickStartRoute
+  '/robots.txt': typeof RobotsDottxtRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/docs/$topic': typeof DocsTopicRoute
   '/docs/': typeof DocsIndexRoute
 }
@@ -87,7 +114,10 @@ export interface FileRouteTypes {
     | '/docs'
     | '/foundation'
     | '/integrations'
+    | '/llms.txt'
     | '/quick-start'
+    | '/robots.txt'
+    | '/sitemap.xml'
     | '/docs/$topic'
     | '/docs/'
   fileRoutesByTo: FileRoutesByTo
@@ -95,7 +125,10 @@ export interface FileRouteTypes {
     | '/'
     | '/foundation'
     | '/integrations'
+    | '/llms.txt'
     | '/quick-start'
+    | '/robots.txt'
+    | '/sitemap.xml'
     | '/docs/$topic'
     | '/docs'
   id:
@@ -104,7 +137,10 @@ export interface FileRouteTypes {
     | '/docs'
     | '/foundation'
     | '/integrations'
+    | '/llms.txt'
     | '/quick-start'
+    | '/robots.txt'
+    | '/sitemap.xml'
     | '/docs/$topic'
     | '/docs/'
   fileRoutesById: FileRoutesById
@@ -114,7 +150,10 @@ export interface RootRouteChildren {
   DocsRoute: typeof DocsRouteWithChildren
   FoundationRoute: typeof FoundationRoute
   IntegrationsRoute: typeof IntegrationsRoute
+  LlmsDottxtRoute: typeof LlmsDottxtRoute
   QuickStartRoute: typeof QuickStartRoute
+  RobotsDottxtRoute: typeof RobotsDottxtRoute
+  SitemapDotxmlRoute: typeof SitemapDotxmlRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -147,11 +186,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IntegrationsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/llms.txt': {
+      id: '/llms.txt'
+      path: '/llms.txt'
+      fullPath: '/llms.txt'
+      preLoaderRoute: typeof LlmsDottxtRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/quick-start': {
       id: '/quick-start'
       path: '/quick-start'
       fullPath: '/quick-start'
       preLoaderRoute: typeof QuickStartRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/robots.txt': {
+      id: '/robots.txt'
+      path: '/robots.txt'
+      fullPath: '/robots.txt'
+      preLoaderRoute: typeof RobotsDottxtRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sitemap.xml': {
+      id: '/sitemap.xml'
+      path: '/sitemap.xml'
+      fullPath: '/sitemap.xml'
+      preLoaderRoute: typeof SitemapDotxmlRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/docs/': {
@@ -188,7 +248,10 @@ const rootRouteChildren: RootRouteChildren = {
   DocsRoute: DocsRouteWithChildren,
   FoundationRoute: FoundationRoute,
   IntegrationsRoute: IntegrationsRoute,
+  LlmsDottxtRoute: LlmsDottxtRoute,
   QuickStartRoute: QuickStartRoute,
+  RobotsDottxtRoute: RobotsDottxtRoute,
+  SitemapDotxmlRoute: SitemapDotxmlRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
