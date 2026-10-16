@@ -13,7 +13,8 @@
 			"**/index.html",
 			"**/vite.config.ts",
 			"!**/src/routeTree.gen.ts",
-			"!**/src/paraglide"
+			"!**/src/paraglide",
+			"!packages/website/src/data/machine.json"
 		]
 	},
 	"formatter": {

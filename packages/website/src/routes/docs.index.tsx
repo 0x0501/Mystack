@@ -1,0 +1,74 @@
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { PageHeading } from "../components/shell";
+import { documents, documentTopics } from "../data/documentation";
+
+export const Route = createFileRoute("/docs/")({
+	head: () => ({
+		meta: [
+			{ title: "Documentation — Mystack" },
+			{
+				name: "description",
+				content:
+					"Guides to Mystack configuration, authentication, project structure and production deployment.",
+			},
+		],
+	}),
+	component: Documentation,
+});
+function Documentation() {
+	return (
+		<>
+			<PageHeading
+				title={
+					<>
+						Understand
+						<br />
+						the assembly.
+					</>
+				}
+			>
+				<p>
+					Practical guides for the project you generate.
+					<br />
+					From choosing services to operating your application.
+				</p>
+			</PageHeading>
+			<div className="docs-index">
+				<div className="docs-intro">
+					<h2>New to Mystack?</h2>
+					<p>
+						The quick start takes you from the project wizard to a running local
+						application.
+					</p>
+					<Link to="/quick-start" className="button">
+						Follow the quick start ↗
+					</Link>
+				</div>
+				<div className="document-list">
+					{documentTopics.map((topic) => (
+						<Link key={topic} to="/docs/$topic" params={{ topic }}>
+							<h2>{documents[topic].title}</h2>
+							<p>{documents[topic].description}</p>
+							<span aria-hidden="true">↗</span>
+						</Link>
+					))}
+				</div>
+			</div>
+			<section className="chapter docs-note">
+				<h2>Source-backed guidance.</h2>
+				<p>
+					These guides describe the maintained Mystack generator. Your generated
+					README is the reference for the exact configuration you selected. The
+					source repository contains deeper architecture notes and contributor
+					documentation.
+				</p>
+				<a
+					className="text-link"
+					href="https://github.com/0x0501/tanstack-starter/tree/main/docs"
+				>
+					Browse the repository documentation ↗
+				</a>
+			</section>
+		</>
+	);
+}
