@@ -9,7 +9,7 @@ bun install --cwd packages/website --frozen-lockfile
 bun run --cwd packages/website dev
 ```
 
-Open http://localhost:3100. The website does not require a database or authentication service.
+Open http://localhost:3100. The website does not require a database or authentication service. Development builds mount TanStack Devtools at the bottom right with the Router panel and the built-in SEO previews; production bundles do not include them.
 
 ```sh
 bun run --cwd packages/website generate-routes
@@ -20,7 +20,22 @@ bun run --cwd packages/website build
 bun run --cwd packages/website start
 ```
 
-The production Bun server serves client assets and TanStack Start SSR; `PORT` defaults to 3100. No public deployment is configured.
+The production Bun server serves client assets and TanStack Start SSR; `PORT` defaults to 3100. No public deployment is configured. Set `VITE_SITE_URL` (for example `https://example.com`) when building for production; canonical URLs, Open Graph images, the sitemap and `llms.txt` use it, and it defaults to `http://localhost:3100`.
+
+## SEO, GEO and social sharing
+
+Following TanStack Start's SEO and LLMO guides, every page is server-rendered and `src/services/seo.ts` is the single source for its metadata:
+
+- Each route's `head` comes from `seo(path)`: title, description, canonical link, Open Graph and Twitter tags, plus JSON-LD (`WebSite` site-wide, `SoftwareApplication` on the home page, `TechArticle` on documentation and Quick start).
+- `/sitemap.xml`, `/robots.txt` and `/llms.txt` are server routes built from the same page list, so a new page appears in all three once it is added to `pages` in `seo.ts`.
+- `public/og.png` (1200×630) is the shared social image. Its source is `scripts/og-image.html`, which reuses the site's fonts, palette and press artwork. Regenerate it after changing that file:
+
+```sh
+"/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" --headless=new --hide-scrollbars \
+  --allow-file-access-from-files --force-device-scale-factor=1 --window-size=1200,630 \
+  --virtual-time-budget=3000 --screenshot="$PWD/packages/website/public/og.png" \
+  "file://$PWD/packages/website/scripts/og-image.html"
+```
 
 ## Pages and objects
 
@@ -40,7 +55,7 @@ Selections survive client navigation; a fresh visit starts from the reference co
 
 `public/models/mystack-assembly.blend` is the editable source scene, built in Blender 4.5.3 LTS. It contains 20 assemblies and 471 modeled objects. The generator merges objects into 54 rigid mechanism batches and exports standard GLBs, precomputed crease-edge buffers, provider thumbnails and static SVG posters.
 
-Three.js renders the GLBs with an orthographic camera and a depth buffer. Moving parts rotate as actual 3D bodies with unit scale; no projected SVG is skewed to simulate rotation. Component changes first open the press before withdrawing and inserting fittings. The press uses one slider-crank model, so the connecting rod keeps its length and the platen follows the crank. Paper feeds before contact and exits after the platen lifts. Authentication and configuration have their own ordered mechanisms. The same pure state functions drive movement and phase captions.
+Three.js renders the GLBs with an orthographic camera and a depth buffer. Moving parts rotate as actual 3D bodies with unit scale; no projected SVG is skewed to simulate rotation. Component changes first open the press before withdrawing and inserting fittings. The press uses one slider-crank model, so the connecting rod keeps its length and the platen follows the crank. Paper feeds before contact and exits after the platen lifts. Authentication and configuration have their own ordered mechanisms. The same pure state functions drive movement.
 
 One canvas persists across client routes. The renderer loads on demand, caches loaded assemblies, precompiles shaders, limits pixel ratio, and uses one time-based frame loop for scroll and anime.js assembly timelines. It stops when settled, in a hidden tab, or after the reading area leaves view. Reduced motion renders a still state while preserving provider choices. The server-rendered SVG poster remains visible before WebGL loads, if it is unavailable, or after context loss.
 
@@ -67,6 +82,7 @@ Blender 4.5 can also run the script in background mode. The script creates its o
 - `src/lib/mechanical-rig.ts`: rigid transforms applied to the actual model nodes.
 - `src/services/mechanics.ts`: slider-crank, lock, composing and drawer behavior.
 - `src/services/assembly.ts`: catalog-to-fitting selection and route composition.
+- `src/services/seo.ts`: page metadata, JSON-LD, sitemap, robots and `llms.txt`.
 - `src/components/stack-context.tsx`, `stack-builder.tsx`, `src/configurator.ts`: shared configuration, accessible native controls and copyable commands.
 - `src/routes/`, `src/data/documentation.ts`: on-site pages and source-backed documentation.
 - `scripts/check-machine.ts`: validates distinct provider geometry, GLBs, edge buffers and static artwork.

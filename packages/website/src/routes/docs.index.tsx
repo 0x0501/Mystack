@@ -1,18 +1,10 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { PageHeading } from "../components/shell";
 import { documents, documentTopics } from "../data/documentation";
+import { seo } from "../services/seo";
 
 export const Route = createFileRoute("/docs/")({
-	head: () => ({
-		meta: [
-			{ title: "Documentation — Mystack" },
-			{
-				name: "description",
-				content:
-					"Guides to Mystack configuration, authentication, project structure and production deployment.",
-			},
-		],
-	}),
+	head: () => seo("/docs"),
 	component: Documentation,
 });
 function Documentation() {

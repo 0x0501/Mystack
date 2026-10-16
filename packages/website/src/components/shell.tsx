@@ -1,7 +1,6 @@
 import { Link, useLocation } from "@tanstack/react-router";
 import type { ReactNode } from "react";
 import { sceneForPath, sideForPath } from "../services/assembly";
-import { mechanismInfo } from "../services/mechanics";
 import { MechanicalWorld } from "./mechanical-world";
 
 const navigation = [
@@ -51,7 +50,9 @@ export function Shell({ children }: { children: ReactNode }) {
 					</Link>
 				))}
 			</nav>
-			<main id="main">{children}</main>
+			<main id="main" key={pathname}>
+				{children}
+			</main>
 			<footer className="site-footer">
 				<div>
 					<h2>
@@ -101,10 +102,7 @@ export function PageHeading({
 	return (
 		<header className="page-heading">
 			<h1>{title}</h1>
-			<div>
-				{children}
-				<MechanismIntro />
-			</div>
+			<div>{children}</div>
 		</header>
 	);
 }
@@ -122,15 +120,5 @@ export function CodeBlock({
 				<code>{children}</code>
 			</pre>
 		</div>
-	);
-}
-
-export function MechanismIntro() {
-	const path = useLocation({ select: (location) => location.pathname });
-	const info = mechanismInfo[sceneForPath(path)];
-	return (
-		<p className="mechanism-description">
-			<strong>{info.title}.</strong> {info.description}
-		</p>
 	);
 }

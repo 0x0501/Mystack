@@ -20,7 +20,6 @@ import {
 	assemblyDelay,
 	type MechanicalScene,
 } from "../services/assembly";
-import { mechanismPhase } from "../services/mechanics";
 import { applyRigPose, type RigNode } from "./mechanical-rig";
 
 export type StageSelection = {
@@ -44,7 +43,6 @@ type Assembly = {
 export function createMechanicalRenderer(
 	canvas: HTMLCanvasElement,
 	onReady: (ready: boolean) => void,
-	onPhase: (phase: string) => void,
 ) {
 	const renderer = new WebGLRenderer({
 		canvas,
@@ -78,7 +76,6 @@ export function createMechanicalRenderer(
 	let targetProgress = 0;
 	let timeline: ReturnType<typeof createTimeline> | undefined;
 	let elapsed = 0;
-	let phase = "";
 	let width = 1;
 	let height = 1;
 	let drawList: Assembly[] = [];
@@ -240,13 +237,6 @@ export function createMechanicalRenderer(
 		}
 		cameraFrame();
 		renderer.render(scene, camera);
-		const next = timeline
-			? "Fitting your selected components"
-			: mechanismPhase(settings.scene, p);
-		if (next !== phase) {
-			phase = next;
-			onPhase(next);
-		}
 	}
 	function tick(now: number) {
 		frame = 0;

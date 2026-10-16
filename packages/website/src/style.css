@@ -148,38 +148,6 @@ main,
 .art-left .mechanical-poster {
 	left: -4%;
 }
-.scene-note {
-	position: fixed;
-	z-index: 1;
-	bottom: 28px;
-	width: 310px;
-	padding: 14px;
-	background: rgb(16 17 15 / 0.94);
-	font-size: 14px;
-	pointer-events: none;
-}
-.note-right {
-	right: 5vw;
-}
-.note-left {
-	left: 5vw;
-}
-.scene-note strong {
-	font-size: 18px;
-	font-weight: 500;
-}
-.scene-note p {
-	margin-top: 7px;
-	color: var(--secondary);
-}
-.mechanism-phase {
-	display: block;
-	margin-top: 12px;
-	color: var(--accent);
-}
-.mechanism-description {
-	display: none;
-}
 .art-left
 	main
 	> :is(
@@ -935,9 +903,21 @@ thead {
 		font-size: 40px;
 	}
 }
+@keyframes page-enter {
+	from {
+		opacity: 0;
+		transform: translateY(18px);
+	}
+}
+main {
+	animation: page-enter 520ms var(--ease) backwards;
+}
 @media (prefers-reduced-motion: reduce) {
 	html {
 		scroll-behavior: auto;
+	}
+	main {
+		animation: none;
 	}
 	.button,
 	.option {
@@ -952,20 +932,6 @@ thead {
 		top: 25%;
 		width: 112%;
 		height: 68%;
-	}
-	.scene-note {
-		display: none;
-	}
-	.mechanism-description {
-		display: block;
-		margin-top: 22px;
-		font-size: 14px;
-		color: var(--secondary);
-		background: var(--ground);
-	}
-	.mechanism-description strong {
-		font-weight: 500;
-		color: var(--ink);
 	}
 	.art-left
 		main
@@ -991,14 +957,4 @@ thead {
 .masthead,
 .navigation {
 	background: rgb(16 17 15 / 0.96);
-}
-.mechanism-phase[hidden] {
-	display: none;
-}
-
-@media (max-width: 760px) {
-	.document .mechanism-description {
-		font-size: 14px;
-		line-height: 1.55;
-	}
 }

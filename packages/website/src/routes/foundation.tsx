@@ -1,17 +1,9 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { CodeBlock, PageHeading } from "../components/shell";
+import { seo } from "../services/seo";
 
 export const Route = createFileRoute("/foundation")({
-	head: () => ({
-		meta: [
-			{ title: "The foundation — Mystack" },
-			{
-				name: "description",
-				content:
-					"Explore the authentication, database, routing and headless UI foundations included in a Mystack application.",
-			},
-		],
-	}),
+	head: () => seo("/foundation"),
 	component: Foundation,
 });
 function Foundation() {

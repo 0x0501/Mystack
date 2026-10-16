@@ -3,18 +3,10 @@ import { CodeBlock, PageHeading } from "../components/shell";
 import { CopyCommand } from "../components/stack-builder";
 import { useStack } from "../components/stack-context";
 import { setupNote } from "../configurator";
+import { articleSchema, seo } from "../services/seo";
 
 export const Route = createFileRoute("/quick-start")({
-	head: () => ({
-		meta: [
-			{ title: "Quick start — Mystack" },
-			{
-				name: "description",
-				content:
-					"Create, configure and run your first Mystack application with Bun and the published project generator.",
-			},
-		],
-	}),
+	head: () => seo("/quick-start", articleSchema("/quick-start")),
 	component: QuickStart,
 });
 function QuickStart() {
