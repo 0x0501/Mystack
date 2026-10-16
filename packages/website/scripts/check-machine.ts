@@ -31,9 +31,12 @@ for (const part of modules.values()) {
 		if (group.edgeOffset % 4 || group.edgeOffset + group.edgeCount * 12 > edges.length) throw new Error(`Invalid edge buffer: ${part.id}/${group.key}`);
 	}
 }
-for (const asset of Object.values(model.posters)) {
-	const svg = readFileSync(new URL(`../public${asset}`, import.meta.url), "utf8");
-	if (/NaN|Infinity|<script|javascript:/i.test(svg)) throw new Error(`Invalid poster: ${asset}`);
+for (const [scene, poster] of Object.entries(model.posters)) {
+	const svg = readFileSync(new URL(`../public${poster.src}`, import.meta.url), "utf8");
+	if (/NaN|Infinity|<script|javascript:/i.test(svg)) throw new Error(`Invalid poster: ${poster.src}`);
+	// The renderer frames the canvas from these numbers, so they must describe the SVG.
+	const view = svg.match(/viewBox="([^"]+)"/)?.[1].split(" ").map(Number);
+	if (view?.length !== 4 || view.some((value, i) => !(Math.abs(value - poster.view[i]) < 1e-6))) throw new Error(`Poster frame differs from its SVG: ${scene}`);
 }
 if (readFileSync(new URL('../public/models/mystack-assembly.blend', import.meta.url)).length < 1000) throw new Error("Missing Blender source");
 console.log(`Valid workshop: ${modules.size} assemblies, ${model.modules.reduce((n, p) => n + p.groups.length, 0)} rigid batches, distinct fittings and valid GLB/edge buffers.`);

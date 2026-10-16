@@ -121,6 +121,7 @@ main,
 	overflow: hidden;
 	pointer-events: none;
 	z-index: 0;
+	container-type: size;
 }
 
 .mechanical-canvas {
@@ -129,24 +130,24 @@ main,
 	width: 100%;
 	height: 100%;
 	opacity: 0;
+	transition: opacity 0.24s ease-out;
 }
+/* The poster box is computed from the WebGL camera (services/stage.ts), so the
+   machine does not move when the canvas takes over. */
 .mechanical-poster {
 	position: absolute;
-	left: 34%;
-	top: 12%;
-	width: 68%;
-	height: 80%;
-	object-fit: contain;
+	left: var(--poster-left);
+	top: var(--poster-top);
+	width: var(--poster-width);
+	height: var(--poster-height);
 	opacity: 0.8;
+	transition: opacity 0.24s ease-out;
 }
 .mechanical-world[data-renderer="webgl"] .mechanical-canvas {
 	opacity: 0.9;
 }
-:where(.mechanical-world[data-renderer="webgl"]) .mechanical-poster {
-	visibility: hidden;
-}
-.art-left .mechanical-poster {
-	left: -4%;
+.mechanical-world[data-renderer="webgl"] .mechanical-poster {
+	opacity: 0;
 }
 .art-left
 	main
@@ -920,18 +921,19 @@ main {
 		animation: none;
 	}
 	.button,
-	.option {
+	.option,
+	.mechanical-canvas,
+	.mechanical-poster {
 		transition: none;
 	}
 }
 
 @media (max-width: 760px) {
-	.mechanical-poster,
-	.art-left .mechanical-poster {
-		left: -6%;
-		top: 25%;
-		width: 112%;
-		height: 68%;
+	.mechanical-poster {
+		left: var(--poster-mobile-left);
+		top: var(--poster-mobile-top);
+		width: var(--poster-mobile-width);
+		height: var(--poster-mobile-height);
 	}
 	.art-left
 		main

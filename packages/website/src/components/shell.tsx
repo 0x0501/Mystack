@@ -25,10 +25,39 @@ export function Shell({ children }: { children: ReactNode }) {
 			</a>
 			<header className="masthead">
 				<Link to="/" className="wordmark" aria-label="Mystack home">
-					<svg viewBox="0 0 70 70" aria-hidden="true">
-						<path
-							d="M6 59V11h13l16 27 16-27h13v48H51V35L35 61 19 35v24Z"
+					<svg viewBox="5.5 8.5 53 47.5" aria-hidden="true">
+						<g stroke="#c9c3ad" strokeWidth="1.1" strokeLinejoin="round">
+							<polygon
+								points="6.65,15.23 16.79,15.23 22.25,9.77 12.11,9.77"
+								fill="#20211b"
+							/>
+							<polygon
+								points="16.79,15.23 29.27,36.29 34.73,30.83 22.25,9.77"
+								fill="#191a16"
+							/>
+							<polygon
+								points="41.75,15.23 51.89,15.23 57.35,9.77 47.21,9.77"
+								fill="#20211b"
+							/>
+							<polygon
+								points="51.89,15.23 51.89,52.67 57.35,47.21 57.35,9.77"
+								fill="#191a16"
+							/>
+							<polygon
+								points="41.75,33.95 29.27,54.23 34.73,48.77 47.21,28.49"
+								fill="#191a16"
+							/>
+							<polygon
+								points="16.79,33.95 16.79,52.67 22.25,47.21 22.25,28.49"
+								fill="#191a16"
+							/>
+						</g>
+						<polygon
+							points="6.65,52.67 6.65,15.23 16.79,15.23 29.27,36.29 41.75,15.23 51.89,15.23 51.89,52.67 41.75,52.67 41.75,33.95 29.27,54.23 16.79,33.95 16.79,52.67"
 							fill="currentColor"
+							stroke="#10110f"
+							strokeWidth="0.8"
+							strokeLinejoin="round"
 						/>
 					</svg>
 					mystack
