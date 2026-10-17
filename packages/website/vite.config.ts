@@ -1,3 +1,4 @@
+import { cloudflare } from "@cloudflare/vite-plugin";
 import { devtools } from "@tanstack/devtools-vite";
 import { tanstackStart } from "@tanstack/react-start/plugin/vite";
 import react from "@vitejs/plugin-react";
@@ -8,6 +9,7 @@ export default defineConfig({
 	// an editor for a path supplied by a request.
 	plugins: [
 		devtools({ editor: { name: "none", open: async () => {} } }),
+		cloudflare({ viteEnvironment: { name: "ssr" } }),
 		tanstackStart(),
 		react(),
 	],

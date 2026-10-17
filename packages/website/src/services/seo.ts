@@ -7,9 +7,11 @@ const siteName = "Mystack";
 const siteDescription =
 	"Create a configured TanStack Start application. Choose your runtime, database, email and payments. Keep the source.";
 
-// Absolute URLs need a real origin: set VITE_SITE_URL when building for production.
+// Absolute URLs need a real origin. Production builds use the deployed domain;
+// VITE_SITE_URL overrides it for another host.
 export const siteUrl = (
-	import.meta.env.VITE_SITE_URL ?? "http://localhost:3100"
+	import.meta.env.VITE_SITE_URL ??
+	(import.meta.env.PROD ? "https://mystack.sumku.cc" : "http://localhost:3100")
 ).replace(/\/+$/, "");
 export const absoluteUrl = (path: string) => `${siteUrl}${path}`;
 
