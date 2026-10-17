@@ -34,7 +34,7 @@ Configure these values in the package's npm settings:
 |---|---|
 | Publisher | GitHub Actions |
 | Organization or user | `0x0501` |
-| Repository | `tanstack-starter` |
+| Repository | `mystack` |
 | Workflow filename | `publish-mystack.yml` |
 | Environment | Empty |
 | Allowed actions | Enable direct publication with `npm publish` |

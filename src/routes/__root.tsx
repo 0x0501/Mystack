@@ -18,7 +18,7 @@ import { sessionQueryOptions } from "@/integrations/better-auth/session-query";
 import { getLocale } from "@/paraglide/runtime";
 import appCss from "../styles.css?url";
 
-const OG_IMAGE = abs("/logo512.png");
+const OG_IMAGE = abs("/og.png");
 
 export const Route = createRootRouteWithContext<MyRouterContext>()({
 	// Each SSR request has its own QueryClient. In the browser, navigation and
@@ -97,6 +97,11 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
 				},
 				{
 					rel: "icon",
+					type: "image/svg+xml",
+					href: "/favicon.svg",
+				},
+				{
+					rel: "icon",
 					type: "image/png",
 					sizes: "512x512",
 					href: "/logo512.png",
@@ -127,7 +132,7 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
 											"@id": `${SITE_ORIGIN}/#organization`,
 											name: SITE_NAME,
 											url: SITE_ORIGIN,
-											logo: abs("/logo512.png"),
+											logo: abs("/favicon.svg"),
 										},
 										{
 											"@type": "WebSite",

@@ -3,7 +3,7 @@
   "configVersion": 1,
   "workspaces": {
     "": {
-      "name": "tanstack-starter",
+      "name": "mystack",
       "dependencies": {
         "@base-ui/react": "^1.8.0",
         "@better-auth/drizzle-adapter": "1.7.3",

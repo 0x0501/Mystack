@@ -1,4 +1,4 @@
-# Local Postgres for TanStack Starter development.
+# Local Postgres for Mystack development.
 # Usage: bun run db:up   /   bun run db:down
 #
 # Credentials live in .env.docker (committed dev defaults).
@@ -8,7 +8,7 @@
 services:
   postgres:
     image: postgres:17
-    container_name: tanstack-starter-db
+    container_name: mystack-db
     restart: unless-stopped
 
     env_file:

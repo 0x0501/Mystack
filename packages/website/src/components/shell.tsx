@@ -67,9 +67,7 @@ export function Shell({ children }: { children: ReactNode }) {
 					<br />
 					With a point of view.
 				</p>
-				<a href="https://github.com/0x0501/tanstack-starter">
-					View on GitHub ↗
-				</a>
+				<a href="https://github.com/0x0501/mystack">View on GitHub ↗</a>
 			</header>
 			<nav className="navigation" aria-label="Main navigation">
 				{navigation.map(([to, title, hint]) => (
@@ -101,7 +99,7 @@ export function Shell({ children }: { children: ReactNode }) {
 							{title}
 						</Link>
 					))}
-					<a href="https://github.com/0x0501/tanstack-starter">GitHub ↗</a>
+					<a href="https://github.com/0x0501/mystack">GitHub ↗</a>
 					<a href="https://www.npmjs.com/package/@0x0501/mystack">npm ↗</a>
 				</nav>
 				<Link to="/integrations" className="footer-cta">

@@ -1,6 +1,6 @@
 # Publish Mystack to npm
 
-Mystack is published as the public package `@0x0501/mystack`, owned by the personal npm account `0x0501`. The GitHub repository is `0x0501/tanstack-starter`. After the first stable release, users can open the wizard with:
+Mystack is published as the public package `@0x0501/mystack`, owned by the personal npm account `0x0501`. The GitHub repository is `0x0501/mystack`. After the first stable release, users can open the wizard with:
 
 ```sh
 bunx @0x0501/mystack
@@ -43,7 +43,7 @@ In npm, open the `@0x0501/mystack` package, select **Settings → Trusted publis
 | Field | Value |
 |---|---|
 | Organization or user | `0x0501` |
-| Repository | `tanstack-starter` |
+| Repository | `mystack` |
 | Workflow filename | `publish-mystack.yml` |
 | Environment name | Leave empty |
 | Allowed actions | Enable `npm publish` |

@@ -1,5 +1,5 @@
 {
-  "projectName": "tanstack-starter",
+  "projectName": "mystack",
   "mode": "file-router",
   "typescript": true,
   "packageManager": "bun",

@@ -1,7 +1,7 @@
 import { catalog } from "../configurator";
 import { documents, documentTopics } from "../data/documentation";
 
-const github = "https://github.com/0x0501/tanstack-starter";
+const github = "https://github.com/0x0501/mystack";
 const npm = "https://www.npmjs.com/package/@0x0501/mystack";
 const siteName = "Mystack";
 const siteDescription =
