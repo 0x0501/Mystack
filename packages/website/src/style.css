@@ -21,6 +21,8 @@
 	--body: 18px;
 	--small: 14px;
 	--heading: clamp(46px, 5.4vw, 82px);
+	--masthead-height: 91px;
+	--navigation-height: 80px;
 	--ease: cubic-bezier(0.22, 1, 0.36, 1);
 	font-family: "Hanken Grotesk", sans-serif;
 	color: var(--ink);
@@ -121,6 +123,12 @@ main,
 	overflow: hidden;
 	pointer-events: none;
 	z-index: 0;
+}
+/* Where the machine is framed: the world below the header, so the header never
+   covers it. The poster is placed in this box and the renderer reads it. */
+.mechanical-stage {
+	position: absolute;
+	inset: calc(var(--masthead-height) + var(--navigation-height)) 0 0;
 	container-type: size;
 }
 
@@ -130,18 +138,17 @@ main,
 	width: 100%;
 	height: 100%;
 	opacity: 0;
-	transition: opacity 0.24s ease-out;
 }
-/* The poster box is computed from the WebGL camera (services/stage.ts), so the
-   machine does not move when the canvas takes over. */
+/* The poster is a still frame of the renderer (scripts/build-posters.ts) and its
+   box comes from the WebGL camera (services/stage.ts), so the canvas replaces it
+   without the machine changing. */
 .mechanical-poster {
 	position: absolute;
 	left: var(--poster-left);
 	top: var(--poster-top);
 	width: var(--poster-width);
 	height: var(--poster-height);
-	opacity: 0.8;
-	transition: opacity 0.24s ease-out;
+	opacity: 0.9;
 }
 .mechanical-world[data-renderer="webgl"] .mechanical-canvas {
 	opacity: 0.9;
@@ -183,6 +190,7 @@ main,
 	align-items: center;
 	justify-content: space-between;
 	gap: 30px;
+	height: var(--masthead-height);
 	padding: 28px var(--pad) 20px;
 }
 .wordmark {
@@ -210,6 +218,7 @@ main,
 .navigation {
 	display: flex;
 	gap: 35px;
+	height: var(--navigation-height);
 	padding: 18px var(--pad);
 }
 .navigation a {
@@ -727,6 +736,7 @@ thead {
 		--heading: 48px;
 	}
 	.masthead {
+		height: auto;
 		padding-top: 25px;
 		gap: 20px;
 	}
@@ -746,6 +756,7 @@ thead {
 	}
 	.navigation {
 		display: grid;
+		height: auto;
 		grid-template-columns: 1fr 1fr;
 		gap: 6px 24px;
 		padding-top: 12px;
@@ -921,14 +932,17 @@ main {
 		animation: none;
 	}
 	.button,
-	.option,
-	.mechanical-canvas,
-	.mechanical-poster {
+	.option {
 		transition: none;
 	}
 }
 
 @media (max-width: 760px) {
+	/* The narrow header is taller and the machine sits below the copy, so the
+	   stage is the whole screen. */
+	.mechanical-stage {
+		top: 0;
+	}
 	.mechanical-poster {
 		left: var(--poster-mobile-left);
 		top: var(--poster-mobile-top);

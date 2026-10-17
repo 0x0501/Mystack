@@ -10,8 +10,9 @@ const target = camera.target as Vector;
 export const cameraOffset = camera.offset as Vector;
 
 export type StageSide = "left" | "right";
-// The stage is the viewport rectangle the machine is drawn into, as fractions
-// of the screen. `y` is measured from the bottom, like a WebGL viewport.
+// The stage is the rectangle the machine is drawn into, as fractions of the
+// stage box: the screen below the header on desktop, the whole screen on narrow
+// ones. `y` is measured from the bottom, like a WebGL viewport.
 export type StageLayout = {
 	x: number;
 	y: number;
@@ -40,8 +41,8 @@ export function stageView(
 			: 8.7
 		: press
 			? route === "/integrations"
-				? 12
-				: 10.5
+				? 11.2
+				: 9.8
 			: scene === "configuration" || scene === "authentication"
 				? 9.5
 				: 7.5;
@@ -70,6 +71,17 @@ const back = unit(cameraOffset);
 const right = unit(cross([0, 1, 0], back));
 const up = cross(back, right);
 
+// A world point in poster pixels (the Blender camera's frame) and its distance
+// toward the camera in world units.
+export function project(point: Vector): Vector {
+	const offset = point.map((v, i) => v - target[i]) as Vector;
+	return [
+		model.width / 2 + camera.pixelsPerUnit * dot(right, offset),
+		model.height / 2 - camera.pixelsPerUnit * dot(up, offset),
+		dot(back, offset),
+	];
+}
+
 const css = (value: number) => `${+value.toFixed(3)}`;
 
 // Where the poster image sits so that its pixels land exactly where the canvas
@@ -85,9 +97,7 @@ export function posterBox(
 	const [viewX, viewY, viewWidth, viewHeightPx] = posters[scene].view;
 	// Poster pixels per container-height unit.
 	const scale = (layout.height * 100) / (viewHeight * camera.pixelsPerUnit);
-	const moved = looking.map((v, i) => v - target[i]) as Vector;
-	const anchorX = model.width / 2 + camera.pixelsPerUnit * dot(right, moved);
-	const anchorY = model.height / 2 - camera.pixelsPerUnit * dot(up, moved);
+	const [anchorX, anchorY] = project(looking);
 	const centerX = (layout.x + layout.width / 2) * 100;
 	const centerY = (1 - layout.y - layout.height / 2) * 100;
 	return {

@@ -289,10 +289,10 @@ for j in range(4):
     for x in [-1.4,-.7,0,.7,1.4]:box('type-divider',(x,0,z+.25),(.04,2.5,.4),.01)
     for y in [-.8,0,.8]:box('type-divider',(0,y,z+.25),(3.7,.04,.4),.01)
     still()
-# Export actual 3D geometry, batched by rigid mechanism; SVGs are still-only posters.
+# Export actual 3D geometry, batched by rigid mechanism. Part SVGs are thumbnails; the page posters are drawn from this geometry by build-posters.ts.
 import array
-OUT=ROOT/'public/models';PARTS=OUT/'parts';POSTERS=OUT/'posters'
-for path in [OUT,PARTS,POSTERS]:path.mkdir(parents=True,exist_ok=True)
+OUT=ROOT/'public/models';PARTS=OUT/'parts'
+for path in [OUT,PARTS]:path.mkdir(parents=True,exist_ok=True)
 bpy.ops.object.camera_add(location=(15,20,15));camera=bpy.context.object
 camera.rotation_euler=(Vector((0,0,2.1))-camera.location).to_track_quat('-Z','Y').to_euler();camera.data.type='ORTHO';camera.data.ortho_scale=12;scene.camera=camera
 bpy.context.view_layer.update();V=(camera.location-Vector((0,0,2.1))).normalized()
@@ -306,7 +306,7 @@ STYLE='<style>.f0{fill:#20211b}.f1{fill:#191a16}.f2{fill:#131410}.edge{fill:none
 def svg(shapes,view=f'0 0 {W} {H}'):
     return f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="{view}">{STYLE}'+''.join(s for _,s in sorted(shapes,key=lambda s:s[0]))+'</svg>'
 
-metadata=[];posters={};all_shapes={}
+metadata=[]
 for key,entry in modules.items():
     shapes=[];bounds=[];batches={}
     for obj in entry['objects']:
@@ -333,7 +333,7 @@ for key,entry in modules.items():
                 pa,pb=projected[a],projected[b];edge_paths.append(f'M{pa[0]:.2f} {pa[1]:.2f}L{pb[0]:.2f} {pb[1]:.2f}')
         markup=''.join(f'<path d="{"".join(ps)}" class="f{shade}"/>' for shade,ps in faces.items() if ps)+f'<path d="{"".join(edge_paths)}" class="edge"/>'
         if group!='impression':shapes.append((sum(verts,Vector()).dot(V)/len(verts),markup))
-    all_shapes[key]=shapes;(PARTS/f'{key}.svg').write_text(svg(shapes))
+    (PARTS/f'{key}.svg').write_text(svg(shapes))
     # Standard GLB scene: one merged surface mesh per independently moving body.
     bpy.ops.object.select_all(action='DESELECT');temporary=[]
     root=bpy.data.objects.new(key,None);scene.collection.objects.link(root);temporary.append(root);root.select_set(True)
@@ -353,16 +353,9 @@ for key,entry in modules.items():
     xs,ys=zip(*bounds)
     metadata.append(dict(id=key,label=entry['label'],category=entry['category'],variant=entry['variant'],offset=convert(entry['offset']),bounds=[min(xs),min(ys),max(xs),max(ys)],objects=len(entry['objects']),asset=f'/models/parts/{key}.svg',model=f'/models/{key}.glb',edges=f'/models/{key}.edges.bin',groups=groups))
 
-scene_parts={'stack':['chassis','backplane','runtime-cloudflare','database-pg-hyperdrive','email-cloudflare','payment-stripe'],'configuration':['document-configuration'],'authentication':['document-authentication'],'structure':['document-structure']}
-scene_parts['deployment']=scene_parts['stack']
-for name,ids in scene_parts.items():
-    selected=[p for p in metadata if p['id'] in ids];bb=[min(p['bounds'][0] for p in selected)-35,min(p['bounds'][1] for p in selected)-35,max(p['bounds'][2] for p in selected)+35,max(p['bounds'][3] for p in selected)+35]
-    view=f'{bb[0]} {bb[1]} {bb[2]-bb[0]} {bb[3]-bb[1]}'
-    (POSTERS/f'{name}.svg').write_text(svg([s for key in ids for s in all_shapes[key]],view))
-    posters[name]=dict(src=f'/models/posters/{name}.svg',view=[bb[0],bb[1],bb[2]-bb[0],bb[3]-bb[1]])
-(ROOT/'src/data/machine.json').write_text(json.dumps(dict(generator='Blender '+bpy.app.version_string,width=W,height=H,camera=dict(target=[0,2.1,0],offset=[round(x,4) for x in convert(camera.location-Vector((0,0,2.1)))],pixelsPerUnit=W/camera.data.ortho_scale),modules=metadata,posters=posters),separators=(',',':')))
+(ROOT/'src/data/machine.json').write_text(json.dumps(dict(generator='Blender '+bpy.app.version_string,width=W,height=H,camera=dict(target=[0,2.1,0],offset=[round(x,4) for x in convert(camera.location-Vector((0,0,2.1)))],pixelsPerUnit=W/camera.data.ortho_scale),modules=metadata),separators=(',',':')))
 # The editable source contains the actual mechanism and all alternate fittings.
-defaults=set(scene_parts['stack'])
+defaults={'chassis','backplane','runtime-cloudflare','database-pg-hyperdrive','email-cloudflare','payment-stripe'}
 for key,entry in modules.items():
     entry['collection'].hide_viewport=key not in defaults;entry['collection'].hide_render=key not in defaults
 bpy.context.preferences.filepaths.save_version=0
