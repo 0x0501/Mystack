@@ -56,7 +56,7 @@ function Documentation() {
 				</p>
 				<a
 					className="text-link"
-					href="https://github.com/0x0501/tanstack-starter/tree/main/docs"
+					href="https://github.com/0x0501/mystack/tree/main/docs"
 				>
 					Browse the repository documentation ↗
 				</a>

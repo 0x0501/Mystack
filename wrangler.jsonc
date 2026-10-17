@@ -1,6 +1,6 @@
 {
 	"$schema": "./node_modules/wrangler/config-schema.json",
-	"name": "tanstack-starter",
+	"name": "mystack",
 	"compatibility_date": "2026-06-01",
 	"compatibility_flags": ["nodejs_compat"],
 	// Custom entry: paraglideMiddleware + Start (original Request under Paraglide).

@@ -1,4 +1,4 @@
-# Spec: Platform capabilities for the TanStack Starter
+# Spec: Platform capabilities for Mystack
 
 **Status:** Living baseline — capability catalog  
 **Date:** 2026-08-01  
