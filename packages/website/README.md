@@ -17,10 +17,26 @@ bun run --cwd packages/website typecheck
 bun run --cwd packages/website art:check
 bun run --cwd packages/website art:motion
 bun run --cwd packages/website build
-bun run --cwd packages/website start
+bun run --cwd packages/website preview
 ```
 
-The production Bun server serves client assets and TanStack Start SSR; `PORT` defaults to 3100. No public deployment is configured. Set `VITE_SITE_URL` (for example `https://example.com`) when building for production; canonical URLs, Open Graph images, the sitemap and `llms.txt` use it, and it defaults to `http://localhost:3100`.
+## Deployment
+
+The site runs as a Cloudflare Worker, `mystack-website` (`wrangler.json`): TanStack Start's server entry plus the client assets, served on the route `mystack.sumku.cc/*` in the `sumku.cc` zone. The route only receives traffic once that hostname has a proxied DNS record. Production builds use `https://mystack.sumku.cc` for canonical URLs, Open Graph images, the sitemap and `llms.txt`; set `VITE_SITE_URL` to build for another host.
+
+`bun run --cwd packages/website deploy` builds and deploys from a machine logged in to Wrangler. `bun run --cwd packages/website preview` serves the production build locally in the Workers runtime.
+
+Pushes deploy through Workers Builds, configured on the Worker in the Cloudflare dashboard (**Workers & Pages** > `mystack-website` > **Settings** > **Build**). The repository holds no CI deploy workflow.
+
+| Setting | Value |
+|---|---|
+| Git repository / production branch | this repository / `main` |
+| Root directory | `packages/website` |
+| Build command | `bun run build` |
+| Deploy command | `bunx wrangler deploy` |
+| Build watch paths | include `packages/website/*`, exclude nothing |
+
+The Worker's name in the dashboard must equal `name` in `wrangler.json`. The website has its own `bun.lock`, which is why the root directory matters: Workers Builds installs from `packages/website`, not from the repository root. Changes outside `packages/website` skip the build, so edits to the root app do not redeploy the site.
 
 ## SEO, GEO and social sharing
 
