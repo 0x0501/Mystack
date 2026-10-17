@@ -10,6 +10,7 @@
 		"typecheck": "tsc --noEmit",
 		"generate-routes": "tsr generate",
 		"art": "python3 scripts/build-machine.py",
+		"art:posters": "bun scripts/build-posters.ts",
 		"art:check": "bun scripts/check-machine.ts",
 		"art:motion": "bun scripts/check-motion.ts"
 	},

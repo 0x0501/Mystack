@@ -43,6 +43,7 @@ type Assembly = {
 
 export function createMechanicalRenderer(
 	canvas: HTMLCanvasElement,
+	stage: HTMLElement,
 	onReady: (ready: boolean) => void,
 ) {
 	const renderer = new WebGLRenderer({
@@ -80,6 +81,8 @@ export function createMechanicalRenderer(
 	let elapsed = 0;
 	let width = 1;
 	let height = 1;
+	// The stage reaches the canvas's bottom and sides; `stageTop` is the header it starts below.
+	let stageTop = 0;
 	let drawList: Assembly[] = [];
 
 	function disposeAssembly(assembly: Assembly) {
@@ -189,20 +192,19 @@ export function createMechanicalRenderer(
 		);
 		const layout = stageLayout(settings.side, mobile);
 		const stageWidth = width * layout.width;
-		const stageHeight = height * layout.height;
+		const stageHeight = (height - stageTop) * layout.height;
 		const drift =
 			(mobile ? 0 : Math.sin(cycle.value * Math.PI) * width * 0.055) *
 			(settings.side === "right" ? -1 : 1);
-		renderer.setViewport(
-			width * layout.x + drift,
-			height * layout.y,
-			stageWidth,
-			stageHeight,
-		);
-		camera.left = (-viewHeight * stageWidth) / stageHeight / 2;
-		camera.right = -camera.left;
-		camera.top = viewHeight / 2;
-		camera.bottom = -camera.top;
+		// The stage is placed by the frustum, not by a viewport: a viewport snaps to
+		// whole pixels, and the poster's CSS box does not.
+		const centerX = width * layout.x + drift + stageWidth / 2;
+		const centerY = (height - stageTop) * layout.y + stageHeight / 2;
+		const unit = viewHeight / stageHeight;
+		camera.left = -centerX * unit;
+		camera.right = (width - centerX) * unit;
+		camera.bottom = -centerY * unit;
+		camera.top = (height - centerY) * unit;
 		// A small, real camera orbit changes composition without shearing the object.
 		camera.position.set(
 			target[0] + cameraOffset[0] + cycle.value * 0.8,
@@ -280,9 +282,10 @@ export function createMechanicalRenderer(
 		} else invalidate();
 	}
 	function resize() {
-		// The canvas fills the fixed world, the same box the poster is placed in.
+		// The canvas fills the fixed world; the poster is placed in the stage box.
 		width = canvas.clientWidth;
 		height = canvas.clientHeight;
+		stageTop = stage.offsetTop;
 		renderer.setPixelRatio(
 			Math.min(devicePixelRatio, narrow.matches ? 1.25 : 1.5),
 		);

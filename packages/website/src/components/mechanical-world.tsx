@@ -19,6 +19,7 @@ export function MechanicalWorld({
 }) {
 	const { selection } = useStack();
 	const canvas = useRef<HTMLCanvasElement>(null);
+	const stage = useRef<HTMLDivElement>(null);
 	const renderer = useRef<ReturnType<typeof createMechanicalRenderer> | null>(
 		null,
 	);
@@ -32,9 +33,13 @@ export function MechanicalWorld({
 		let disposed = false;
 		import("../lib/mechanical-renderer")
 			.then(({ createMechanicalRenderer }) => {
-				if (disposed || !canvas.current) return;
+				if (disposed || !canvas.current || !stage.current) return;
 				try {
-					renderer.current = createMechanicalRenderer(canvas.current, setReady);
+					renderer.current = createMechanicalRenderer(
+						canvas.current,
+						stage.current,
+						setReady,
+					);
 					void renderer.current
 						.set(current.current)
 						.catch(() => setReady(false));
@@ -63,12 +68,14 @@ export function MechanicalWorld({
 			data-renderer={ready ? "webgl" : "poster"}
 			data-selection={signature}
 		>
-			<img
-				className="mechanical-poster"
-				src={model.posters[scene].src}
-				alt=""
-				style={posterVariables(scene, route, side) as CSSProperties}
-			/>
+			<div className="mechanical-stage" ref={stage}>
+				<img
+					className="mechanical-poster"
+					src={model.posters[scene].src}
+					alt=""
+					style={posterVariables(scene, route, side) as CSSProperties}
+				/>
+			</div>
 			<canvas className="mechanical-canvas" ref={canvas} />
 		</div>
 	);
