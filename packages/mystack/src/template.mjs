@@ -39,7 +39,8 @@ export async function readTemplate(root, { packaged = false } = {}) {
 			path.startsWith("scripts/mystack") ||
 			path === "src/__tests__/mystack.test.ts" ||
 			path === "src/__tests__/website-configurator.test.ts" ||
-			path === "src/__tests__/website-mechanics.test.ts"
+			path === "src/__tests__/website-mechanics.test.ts" ||
+			path === "src/__tests__/website-seo.test.ts"
 		)
 			return;
 		const absolute = join(
