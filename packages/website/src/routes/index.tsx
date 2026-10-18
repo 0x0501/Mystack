@@ -1,5 +1,5 @@
-import { ArrowUpRight } from "../components/arrow-up-right";
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { ArrowUpRight } from "../components/arrow-up-right";
 import { CodeBlock } from "../components/shell";
 import { seo, softwareSchema } from "../services/seo";
 
