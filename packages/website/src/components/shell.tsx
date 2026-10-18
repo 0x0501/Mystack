@@ -1,3 +1,4 @@
+import { ArrowUpRight } from "./arrow-up-right";
 import { Link, useLocation } from "@tanstack/react-router";
 import type { ReactNode } from "react";
 import { sceneForPath, sideForPath } from "../services/assembly";
@@ -63,11 +64,9 @@ export function Shell({ children }: { children: ReactNode }) {
 					mystack
 				</Link>
 				<p>
-					A starting point.
-					<br />
-					With a point of view.
+					A starting point. With a point of view.
 				</p>
-				<a href="https://github.com/0x0501/mystack">View on GitHub ↗</a>
+				<a href="https://github.com/0x0501/mystack">View on GitHub <ArrowUpRight /></a>
 			</header>
 			<nav className="navigation" aria-label="Main navigation">
 				{navigation.map(([to, title, hint]) => (
@@ -99,21 +98,18 @@ export function Shell({ children }: { children: ReactNode }) {
 							{title}
 						</Link>
 					))}
-					<a href="https://github.com/0x0501/mystack">GitHub ↗</a>
-					<a href="https://www.npmjs.com/package/@0x0501/mystack">npm ↗</a>
+					<a href="https://github.com/0x0501/mystack">GitHub <ArrowUpRight /></a>
+					<a href="https://www.npmjs.com/package/@0x0501/mystack">npm <ArrowUpRight /></a>
 				</nav>
 				<Link to="/integrations" className="footer-cta">
-					Build your stack <span aria-hidden="true">↗</span>
+					Build your stack <ArrowUpRight />
 				</Link>
 				<div className="footer-mark" aria-hidden="true">
 					mystack
 				</div>
 				<div className="credits">
 					<span>Mystack · MIT licensed</span>
-					<span>
-						Built with TanStack Start. Modeled in Blender. Rendered with
-						Three.js.
-					</span>
+					<span>Built with TanStack Start</span>
 				</div>
 			</footer>
 		</div>

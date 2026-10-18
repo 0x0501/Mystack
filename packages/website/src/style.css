@@ -207,6 +207,7 @@ main,
 }
 .masthead p {
 	margin-left: auto;
+	white-space: nowrap;
 	color: var(--secondary);
 	font-size: var(--small);
 	line-height: 1.35;
@@ -247,9 +248,18 @@ main,
 .button:active {
 	transform: scale(0.97);
 }
-.button > span {
-	font-size: 28px;
-	line-height: 1;
+.arrow-icon {
+	width: 0.85em;
+	height: 0.85em;
+	margin-left: 0.2em;
+	vertical-align: -0.05em;
+	flex: none;
+}
+.button > .arrow-icon {
+	width: 28px;
+	height: 28px;
+	margin-left: 0;
+	vertical-align: baseline;
 }
 .text-link {
 	display: inline-block;

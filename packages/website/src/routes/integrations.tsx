@@ -1,3 +1,4 @@
+import { ArrowUpRight } from "../components/arrow-up-right";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { CodeBlock, PageHeading } from "../components/shell";
 import { CopyCommand, StackBuilder } from "../components/stack-builder";
@@ -136,7 +137,7 @@ function Integrations() {
 					params={{ topic: "configuration" }}
 					className="text-link"
 				>
-					Read the configuration reference ↗
+					Read the configuration reference <ArrowUpRight />
 				</Link>
 			</section>
 		</>

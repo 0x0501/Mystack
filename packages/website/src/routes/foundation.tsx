@@ -1,3 +1,4 @@
+import { ArrowUpRight } from "../components/arrow-up-right";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { CodeBlock, PageHeading } from "../components/shell";
 import { seo } from "../services/seo";
@@ -59,7 +60,7 @@ function Foundation() {
 						params={{ topic: "authentication" }}
 						className="text-link"
 					>
-						Explore authentication ↗
+						Explore authentication <ArrowUpRight />
 					</Link>
 				</div>
 				<CodeBlock title="Auth configuration · plugin excerpt">
@@ -90,7 +91,7 @@ function Foundation() {
 						params={{ topic: "project-structure" }}
 						className="text-link"
 					>
-						See the source structure ↗
+						See the source structure <ArrowUpRight />
 					</Link>
 				</div>
 			</section>
