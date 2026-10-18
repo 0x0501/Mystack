@@ -1,4 +1,3 @@
-import { ArrowUpRight } from "./arrow-up-right";
 import { useState } from "react";
 import {
 	type Category,
@@ -7,6 +6,7 @@ import {
 	incompatibilities,
 } from "../configurator";
 import model from "../data/machine.json";
+import { ArrowUpRight } from "./arrow-up-right";
 import { useStack } from "./stack-context";
 
 export function CopyCommand() {
