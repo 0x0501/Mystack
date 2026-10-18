@@ -1,3 +1,4 @@
+import { ArrowUpRight } from "./arrow-up-right";
 import { useState } from "react";
 import {
 	type Category,
@@ -33,7 +34,7 @@ export function CopyCommand() {
 				<code>{command}</code>
 			</pre>
 			<button type="button" className="button" onClick={copy}>
-				Copy command <span aria-hidden="true">↗</span>
+				Copy command <ArrowUpRight />
 			</button>
 			<p className="copy-feedback" role="status">
 				{copied?.command === command

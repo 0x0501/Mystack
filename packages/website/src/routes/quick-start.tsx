@@ -1,3 +1,4 @@
+import { ArrowUpRight } from "../components/arrow-up-right";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { CodeBlock, PageHeading } from "../components/shell";
 import { CopyCommand } from "../components/stack-builder";
@@ -31,7 +32,7 @@ function QuickStart() {
 				<aside className="quick-machine">
 					<p>Your choices stay with you as you explore the site.</p>
 					<Link to="/integrations" className="text-link">
-						Change your configuration ↗
+						Change your configuration <ArrowUpRight />
 					</Link>
 				</aside>
 				<ol className="quick-steps">
@@ -98,7 +99,7 @@ function QuickStart() {
 					params={{ topic: "deployment" }}
 					className="button"
 				>
-					Read the deployment guide ↗
+					Read the deployment guide <ArrowUpRight />
 				</Link>
 			</section>
 		</>

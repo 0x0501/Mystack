@@ -1,3 +1,4 @@
+import { ArrowUpRight } from "../components/arrow-up-right";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { PageHeading } from "../components/shell";
 import { documents, documentTopics } from "../data/documentation";
@@ -33,7 +34,7 @@ function Documentation() {
 						application.
 					</p>
 					<Link to="/quick-start" className="button">
-						Follow the quick start ↗
+						Follow the quick start <ArrowUpRight />
 					</Link>
 				</div>
 				<div className="document-list">
@@ -41,7 +42,7 @@ function Documentation() {
 						<Link key={topic} to="/docs/$topic" params={{ topic }}>
 							<h2>{documents[topic].title}</h2>
 							<p>{documents[topic].description}</p>
-							<span aria-hidden="true">↗</span>
+							<ArrowUpRight />
 						</Link>
 					))}
 				</div>
@@ -58,7 +59,7 @@ function Documentation() {
 					className="text-link"
 					href="https://github.com/0x0501/mystack/tree/main/docs"
 				>
-					Browse the repository documentation ↗
+					Browse the repository documentation <ArrowUpRight />
 				</a>
 			</section>
 		</>
