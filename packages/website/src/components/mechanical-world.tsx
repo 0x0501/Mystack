@@ -1,11 +1,11 @@
-import { useEffect, useRef, useState } from "react";
+import { type CSSProperties, useEffect, useRef, useState } from "react";
 import model from "../data/machine.json";
 import type {
 	createMechanicalRenderer,
 	StageSelection,
 } from "../lib/mechanical-renderer";
 import { type MechanicalScene, modulesForScene } from "../services/assembly";
-import { mechanismInfo, mechanismPhase } from "../services/mechanics";
+import { posterVariables } from "../services/stage";
 import { useStack } from "./stack-context";
 
 export function MechanicalWorld({
@@ -19,7 +19,7 @@ export function MechanicalWorld({
 }) {
 	const { selection } = useStack();
 	const canvas = useRef<HTMLCanvasElement>(null);
-	const phase = useRef<HTMLSpanElement>(null);
+	const stage = useRef<HTMLDivElement>(null);
 	const renderer = useRef<ReturnType<typeof createMechanicalRenderer> | null>(
 		null,
 	);
@@ -33,14 +33,12 @@ export function MechanicalWorld({
 		let disposed = false;
 		import("../lib/mechanical-renderer")
 			.then(({ createMechanicalRenderer }) => {
-				if (disposed || !canvas.current) return;
+				if (disposed || !canvas.current || !stage.current) return;
 				try {
 					renderer.current = createMechanicalRenderer(
 						canvas.current,
+						stage.current,
 						setReady,
-						(text) => {
-							if (phase.current) phase.current.textContent = text;
-						},
 					);
 					void renderer.current
 						.set(current.current)
@@ -63,33 +61,22 @@ export function MechanicalWorld({
 	}, [scene, side, route, signature]);
 
 	return (
-		<>
-			<div
-				className={`mechanical-world world-${scene}`}
-				aria-hidden="true"
-				data-scene={scene}
-				data-renderer={ready ? "webgl" : "poster"}
-				data-selection={signature}
-			>
+		<div
+			className={`mechanical-world world-${scene}`}
+			aria-hidden="true"
+			data-scene={scene}
+			data-renderer={ready ? "webgl" : "poster"}
+			data-selection={signature}
+		>
+			<div className="mechanical-stage" ref={stage}>
 				<img
 					className="mechanical-poster"
-					src={model.posters[scene]}
+					src={model.posters[scene].src}
 					alt=""
-					width="1200"
-					height="980"
+					style={posterVariables(scene, route, side) as CSSProperties}
 				/>
-				<canvas className="mechanical-canvas" ref={canvas} />
 			</div>
-			<aside
-				className={`scene-note note-${side}`}
-				aria-label="About the illustration"
-			>
-				<strong>{mechanismInfo[scene].title}.</strong>
-				<p>{mechanismInfo[scene].description}</p>
-				<span ref={phase} hidden={!ready} className="mechanism-phase">
-					{mechanismPhase(scene, 0)}
-				</span>
-			</aside>
-		</>
+			<canvas className="mechanical-canvas" ref={canvas} />
+		</div>
 	);
 }

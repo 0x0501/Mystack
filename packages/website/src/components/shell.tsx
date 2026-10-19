@@ -1,7 +1,7 @@
 import { Link, useLocation } from "@tanstack/react-router";
 import type { ReactNode } from "react";
 import { sceneForPath, sideForPath } from "../services/assembly";
-import { mechanismInfo } from "../services/mechanics";
+import { ArrowUpRight } from "./arrow-up-right";
 import { MechanicalWorld } from "./mechanical-world";
 
 const navigation = [
@@ -26,21 +26,46 @@ export function Shell({ children }: { children: ReactNode }) {
 			</a>
 			<header className="masthead">
 				<Link to="/" className="wordmark" aria-label="Mystack home">
-					<svg viewBox="0 0 70 70" aria-hidden="true">
-						<path
-							d="M6 59V11h13l16 27 16-27h13v48H51V35L35 61 19 35v24Z"
+					<svg viewBox="5.5 8.5 53 47.5" aria-hidden="true">
+						<g stroke="#c9c3ad" strokeWidth="1.1" strokeLinejoin="round">
+							<polygon
+								points="6.65,15.23 16.79,15.23 22.25,9.77 12.11,9.77"
+								fill="#20211b"
+							/>
+							<polygon
+								points="16.79,15.23 29.27,36.29 34.73,30.83 22.25,9.77"
+								fill="#191a16"
+							/>
+							<polygon
+								points="41.75,15.23 51.89,15.23 57.35,9.77 47.21,9.77"
+								fill="#20211b"
+							/>
+							<polygon
+								points="51.89,15.23 51.89,52.67 57.35,47.21 57.35,9.77"
+								fill="#191a16"
+							/>
+							<polygon
+								points="41.75,33.95 29.27,54.23 34.73,48.77 47.21,28.49"
+								fill="#191a16"
+							/>
+							<polygon
+								points="16.79,33.95 16.79,52.67 22.25,47.21 22.25,28.49"
+								fill="#191a16"
+							/>
+						</g>
+						<polygon
+							points="6.65,52.67 6.65,15.23 16.79,15.23 29.27,36.29 41.75,15.23 51.89,15.23 51.89,52.67 41.75,52.67 41.75,33.95 29.27,54.23 16.79,33.95 16.79,52.67"
 							fill="currentColor"
+							stroke="#10110f"
+							strokeWidth="0.8"
+							strokeLinejoin="round"
 						/>
 					</svg>
 					mystack
 				</Link>
-				<p>
-					A starting point.
-					<br />
-					With a point of view.
-				</p>
-				<a href="https://github.com/0x0501/tanstack-starter">
-					View on GitHub ↗
+				<p>A starting point. With a point of view.</p>
+				<a href="https://github.com/0x0501/mystack">
+					View on GitHub <ArrowUpRight />
 				</a>
 			</header>
 			<nav className="navigation" aria-label="Main navigation">
@@ -51,7 +76,9 @@ export function Shell({ children }: { children: ReactNode }) {
 					</Link>
 				))}
 			</nav>
-			<main id="main">{children}</main>
+			<main id="main" key={pathname}>
+				{children}
+			</main>
 			<footer className="site-footer">
 				<div>
 					<h2>
@@ -71,21 +98,22 @@ export function Shell({ children }: { children: ReactNode }) {
 							{title}
 						</Link>
 					))}
-					<a href="https://github.com/0x0501/tanstack-starter">GitHub ↗</a>
-					<a href="https://www.npmjs.com/package/@0x0501/mystack">npm ↗</a>
+					<a href="https://github.com/0x0501/mystack">
+						GitHub <ArrowUpRight />
+					</a>
+					<a href="https://www.npmjs.com/package/@0x0501/mystack">
+						npm <ArrowUpRight />
+					</a>
 				</nav>
 				<Link to="/integrations" className="footer-cta">
-					Build your stack <span aria-hidden="true">↗</span>
+					Build your stack <ArrowUpRight />
 				</Link>
 				<div className="footer-mark" aria-hidden="true">
 					mystack
 				</div>
 				<div className="credits">
 					<span>Mystack · MIT licensed</span>
-					<span>
-						Built with TanStack Start. Modeled in Blender. Rendered with
-						Three.js.
-					</span>
+					<span>Built with TanStack Start</span>
 				</div>
 			</footer>
 		</div>
@@ -101,10 +129,7 @@ export function PageHeading({
 	return (
 		<header className="page-heading">
 			<h1>{title}</h1>
-			<div>
-				{children}
-				<MechanismIntro />
-			</div>
+			<div>{children}</div>
 		</header>
 	);
 }
@@ -122,15 +147,5 @@ export function CodeBlock({
 				<code>{children}</code>
 			</pre>
 		</div>
-	);
-}
-
-export function MechanismIntro() {
-	const path = useLocation({ select: (location) => location.pathname });
-	const info = mechanismInfo[sceneForPath(path)];
-	return (
-		<p className="mechanism-description">
-			<strong>{info.title}.</strong> {info.description}
-		</p>
 	);
 }

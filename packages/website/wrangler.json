@@ -1,0 +1,11 @@
+{
+	"$schema": "node_modules/wrangler/config-schema.json",
+	"name": "mystack-website",
+	"compatibility_date": "2026-10-17",
+	"compatibility_flags": ["nodejs_compat"],
+	"main": "@tanstack/react-start/server-entry",
+	"observability": { "enabled": true },
+	// The zone's DNS needs a proxied record for this hostname before the route
+	// receives traffic.
+	"routes": [{ "pattern": "mystack.sumku.cc/*", "zone_name": "sumku.cc" }]
+}

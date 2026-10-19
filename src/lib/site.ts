@@ -26,8 +26,7 @@ function readOrigin(): string {
 
 /** Display name for <title>, PWA, and schema.org. */
 export const SITE_NAME =
-	(import.meta.env.VITE_APP_TITLE as string | undefined)?.trim() ||
-	"TanStack Starter";
+	(import.meta.env.VITE_APP_TITLE as string | undefined)?.trim() || "Mystack";
 
 /**
  * Absolute origin used for OG/JSON-LD URLs.

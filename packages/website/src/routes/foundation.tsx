@@ -1,17 +1,10 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { ArrowUpRight } from "../components/arrow-up-right";
 import { CodeBlock, PageHeading } from "../components/shell";
+import { seo } from "../services/seo";
 
 export const Route = createFileRoute("/foundation")({
-	head: () => ({
-		meta: [
-			{ title: "The foundation — Mystack" },
-			{
-				name: "description",
-				content:
-					"Explore the authentication, database, routing and headless UI foundations included in a Mystack application.",
-			},
-		],
-	}),
+	head: () => seo("/foundation"),
 	component: Foundation,
 });
 function Foundation() {
@@ -67,7 +60,7 @@ function Foundation() {
 						params={{ topic: "authentication" }}
 						className="text-link"
 					>
-						Explore authentication ↗
+						Explore authentication <ArrowUpRight />
 					</Link>
 				</div>
 				<CodeBlock title="Auth configuration · plugin excerpt">
@@ -98,7 +91,7 @@ function Foundation() {
 						params={{ topic: "project-structure" }}
 						className="text-link"
 					>
-						See the source structure ↗
+						See the source structure <ArrowUpRight />
 					</Link>
 				</div>
 			</section>

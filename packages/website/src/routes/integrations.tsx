@@ -1,19 +1,12 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { ArrowUpRight } from "../components/arrow-up-right";
 import { CodeBlock, PageHeading } from "../components/shell";
 import { CopyCommand, StackBuilder } from "../components/stack-builder";
 import { useStack } from "../components/stack-context";
+import { seo } from "../services/seo";
 
 export const Route = createFileRoute("/integrations")({
-	head: () => ({
-		meta: [
-			{ title: "Integrations — Mystack" },
-			{
-				name: "description",
-				content:
-					"Choose compatible runtime, database, email and payment integrations. Watch your selected stack assemble and copy its real CLI command.",
-			},
-		],
-	}),
+	head: () => seo("/integrations"),
 	component: Integrations,
 });
 function Integrations() {
@@ -144,7 +137,7 @@ function Integrations() {
 					params={{ topic: "configuration" }}
 					className="text-link"
 				>
-					Read the configuration reference ↗
+					Read the configuration reference <ArrowUpRight />
 				</Link>
 			</section>
 		</>

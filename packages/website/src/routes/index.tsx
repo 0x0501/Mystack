@@ -1,8 +1,10 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { CodeBlock, MechanismIntro } from "../components/shell";
+import { ArrowUpRight } from "../components/arrow-up-right";
+import { CodeBlock } from "../components/shell";
+import { seo, softwareSchema } from "../services/seo";
 
 export const Route = createFileRoute("/")({
-	head: () => ({ meta: [{ title: "Mystack — Your stack, connected" }] }),
+	head: () => seo("/", softwareSchema),
 	component: Home,
 });
 function Home() {
@@ -20,9 +22,8 @@ function Home() {
 						Choose the components. Keep the source.
 					</p>
 					<Link to="/integrations" className="button">
-						Build your stack <span aria-hidden="true">↗</span>
+						Build your stack <ArrowUpRight />
 					</Link>
-					<MechanismIntro />
 					<span className="small-note">
 						Open source. Yours from the first line.
 					</span>
@@ -54,7 +55,7 @@ function Home() {
 						archive, and only the expansion modules you selected.
 					</p>
 					<Link to="/integrations" className="text-link">
-						Explore the integrations ↗
+						Explore the integrations <ArrowUpRight />
 					</Link>
 				</div>
 			</section>
@@ -76,7 +77,7 @@ function Home() {
 							make your own.
 						</p>
 						<Link to="/foundation" className="text-link">
-							Inside the foundation ↗
+							Inside the foundation <ArrowUpRight />
 						</Link>
 						<CodeBlock title="A complete application">
 							{
@@ -98,7 +99,7 @@ function Home() {
 						services, and follow the generated README.
 					</p>
 					<Link to="/quick-start" className="button">
-						Create your first app <span aria-hidden="true">↗</span>
+						Create your first app <ArrowUpRight />
 					</Link>
 				</div>
 				<CodeBlock title="Open the project wizard">
@@ -119,7 +120,7 @@ function Home() {
 						fit together, and what to configure before production.
 					</p>
 					<Link to="/docs" className="text-link">
-						Read the documentation ↗
+						Read the documentation <ArrowUpRight />
 					</Link>
 				</div>
 			</section>

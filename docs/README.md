@@ -1,4 +1,4 @@
-# Mystack / TanStack Starter docs
+# Mystack docs
 
 New application users start with Mystack. Contributor guides explain how the CLI and its single runnable reference template are maintained. Use glossary terms in specs, issues, and code.
 

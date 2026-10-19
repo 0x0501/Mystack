@@ -19,7 +19,7 @@ const csrfMiddleware = createCsrfMiddleware({
 // This registration is load-bearing and must never lag behind the middleware
 // that throw: shipping the throws alone loses `.status` on the wire.
 const httpErrorAdapter = createSerializationAdapter({
-	key: "tanstack-starter/HttpError",
+	key: "mystack/HttpError",
 	test: (value): value is HttpError => value instanceof HttpError,
 	toSerializable: ({ status, error, message }: HttpError) => ({
 		status,

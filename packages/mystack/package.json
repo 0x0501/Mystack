@@ -5,12 +5,12 @@
 	"license": "MIT",
 	"repository": {
 		"type": "git",
-		"url": "git+https://github.com/0x0501/tanstack-starter.git",
+		"url": "git+https://github.com/0x0501/mystack.git",
 		"directory": "packages/mystack"
 	},
-	"homepage": "https://github.com/0x0501/tanstack-starter/tree/main/packages/mystack#readme",
+	"homepage": "https://github.com/0x0501/mystack/tree/main/packages/mystack#readme",
 	"bugs": {
-		"url": "https://github.com/0x0501/tanstack-starter/issues"
+		"url": "https://github.com/0x0501/mystack/issues"
 	},
 	"type": "module",
 	"engines": {

@@ -1,22 +1,21 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
-import { CodeBlock, MechanismIntro } from "../components/shell";
+import { ArrowUpRight } from "../components/arrow-up-right";
+import { CodeBlock } from "../components/shell";
 import {
 	type DocumentTopic,
 	documents,
 	documentTopics,
 } from "../data/documentation";
+import { articleSchema, seo } from "../services/seo";
 
 export const Route = createFileRoute("/docs/$topic")({
 	beforeLoad: ({ params }) => {
 		if (!Object.hasOwn(documents, params.topic)) throw notFound();
 	},
-	head: ({ params }) => ({
-		meta: [
-			{
-				title: `${documents[params.topic as DocumentTopic]?.title ?? "Documentation"} — Mystack`,
-			},
-		],
-	}),
+	head: ({ params }) => {
+		const path = `/docs/${params.topic}`;
+		return seo(path, articleSchema(path));
+	},
 	component: Document,
 });
 function Document() {
@@ -45,7 +44,6 @@ function Document() {
 				<header>
 					<h1>{document.title}</h1>
 					<p>{document.description}</p>
-					<MechanismIntro />
 				</header>
 				<nav className="document-contents" aria-label="On this page">
 					{document.sections.map((section) => (
@@ -65,7 +63,9 @@ function Document() {
 				))}
 				<div className="document-bottom">
 					<Link to="/quick-start">Quick start</Link>
-					<Link to="/integrations">Build your stack ↗</Link>
+					<Link to="/integrations">
+						Build your stack <ArrowUpRight />
+					</Link>
 				</div>
 			</article>
 		</div>

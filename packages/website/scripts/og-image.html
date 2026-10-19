@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<title>Mystack Open Graph image</title>
+		<style>
+			@font-face {
+				font-family: "Hanken Grotesk";
+				src: url("../public/fonts/hanken-400.ttf") format("truetype");
+				font-weight: 400;
+			}
+			@font-face {
+				font-family: "Hanken Grotesk";
+				src: url("../public/fonts/hanken-500.ttf") format("truetype");
+				font-weight: 500;
+			}
+			:root {
+				--ground: #10110f;
+				--ink: #eeede7;
+				--secondary: #b5b3a7;
+				--accent: #d6c69c;
+			}
+			* {
+				box-sizing: border-box;
+				margin: 0;
+			}
+			html,
+			body {
+				width: 1200px;
+				height: 630px;
+				overflow: hidden;
+				background: var(--ground);
+				color: var(--ink);
+				font-family: "Hanken Grotesk", sans-serif;
+			}
+			.plate {
+				position: absolute;
+				inset: 22px;
+				border: 1px solid rgb(214 198 156 / 0.38);
+			}
+			.plate::before {
+				content: "";
+				position: absolute;
+				inset: 6px;
+				border: 1px solid rgb(214 198 156 / 0.16);
+			}
+			.press {
+				position: absolute;
+				right: 64px;
+				top: 56px;
+				width: 510px;
+				height: 480px;
+				object-fit: contain;
+				opacity: 0.9;
+			}
+			.wordmark {
+				position: absolute;
+				left: 80px;
+				top: 70px;
+				display: flex;
+				align-items: center;
+				gap: 12px;
+				font-size: 46px;
+				font-weight: 500;
+				letter-spacing: -0.075em;
+				line-height: 1;
+			}
+			.wordmark svg {
+				width: 32px;
+			}
+			h1 {
+				position: absolute;
+				left: 80px;
+				top: 196px;
+				font-size: 112px;
+				font-weight: 500;
+				line-height: 0.98;
+				letter-spacing: -0.045em;
+			}
+			.lede {
+				position: absolute;
+				left: 82px;
+				top: 442px;
+				width: 520px;
+				color: var(--secondary);
+				font-size: 25px;
+				line-height: 1.4;
+			}
+			.command {
+				position: absolute;
+				left: 82px;
+				bottom: 66px;
+				color: var(--accent);
+				font-family: monospace;
+				font-size: 20px;
+			}
+			.caption {
+				position: absolute;
+				right: 82px;
+				bottom: 66px;
+				color: var(--secondary);
+				font-size: 15px;
+				letter-spacing: 0.22em;
+				text-transform: uppercase;
+			}
+		</style>
+	</head>
+	<body>
+		<div class="plate"></div>
+		<img class="press" src="../public/models/posters/stack.svg" alt="" />
+		<div class="wordmark">
+			<svg viewBox="0 0 70 70" aria-hidden="true">
+				<path
+					d="M6 59V11h13l16 27 16-27h13v48H51V35L35 61 19 35v24Z"
+					fill="currentColor"
+				/>
+			</svg>
+			mystack
+		</div>
+		<h1>Your stack.<br />Connected.</h1>
+		<p class="lede">
+			A TanStack Start foundation with auth, data, email and payments.
+		</p>
+		<p class="command">$ bunx @0x0501/mystack@latest create my-app</p>
+		<p class="caption">Plate I · The project press</p>
+	</body>
+</html>

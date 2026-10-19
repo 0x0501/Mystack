@@ -1,4 +1,4 @@
-# TanStack Starter context
+# Mystack context
 
 A generic SaaS starter generated with Mystack. New products use `mystack create` and add their own domain in the generated application; the Starter ships **platform capabilities only**. The repository root is the canonical PostgreSQL + Hyperdrive / Cloudflare Workers reference template, maintained alongside the CLI. See [ADR 0012](./docs/adr/0012-mystack-project-generation.md).
 

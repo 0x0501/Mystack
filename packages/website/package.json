@@ -5,11 +5,12 @@
 	"scripts": {
 		"dev": "vite --host 0.0.0.0 --port 3100",
 		"build": "vite build",
-		"start": "bun server.mjs",
-		"preview": "bun server.mjs",
+		"preview": "vite preview",
+		"deploy": "vite build && wrangler deploy",
 		"typecheck": "tsc --noEmit",
 		"generate-routes": "tsr generate",
 		"art": "python3 scripts/build-machine.py",
+		"art:posters": "bun scripts/build-posters.ts",
 		"art:check": "bun scripts/check-machine.ts",
 		"art:motion": "bun scripts/check-motion.ts"
 	},
@@ -22,6 +23,10 @@
 		"three": "^0.186.1"
 	},
 	"devDependencies": {
+		"@cloudflare/vite-plugin": "^1.62.5",
+		"@tanstack/devtools-vite": "0.8.5",
+		"@tanstack/react-devtools": "0.10.13",
+		"@tanstack/react-router-devtools": "1.167.2",
 		"@tanstack/router-cli": "1.167.38",
 		"@types/node": "^26.6.4",
 		"@types/react": "^19.3.0",
@@ -29,6 +34,7 @@
 		"@types/three": "^0.186.0",
 		"@vitejs/plugin-react": "^6.1.1",
 		"typescript": "^7.0.2",
-		"vite": "^8.3.2"
+		"vite": "^8.3.2",
+		"wrangler": "^4.147.0"
 	}
 }

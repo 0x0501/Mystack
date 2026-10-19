@@ -1,20 +1,13 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { ArrowUpRight } from "../components/arrow-up-right";
 import { CodeBlock, PageHeading } from "../components/shell";
 import { CopyCommand } from "../components/stack-builder";
 import { useStack } from "../components/stack-context";
 import { setupNote } from "../configurator";
+import { articleSchema, seo } from "../services/seo";
 
 export const Route = createFileRoute("/quick-start")({
-	head: () => ({
-		meta: [
-			{ title: "Quick start — Mystack" },
-			{
-				name: "description",
-				content:
-					"Create, configure and run your first Mystack application with Bun and the published project generator.",
-			},
-		],
-	}),
+	head: () => seo("/quick-start", articleSchema("/quick-start")),
 	component: QuickStart,
 });
 function QuickStart() {
@@ -39,7 +32,7 @@ function QuickStart() {
 				<aside className="quick-machine">
 					<p>Your choices stay with you as you explore the site.</p>
 					<Link to="/integrations" className="text-link">
-						Change your configuration ↗
+						Change your configuration <ArrowUpRight />
 					</Link>
 				</aside>
 				<ol className="quick-steps">
@@ -106,7 +99,7 @@ function QuickStart() {
 					params={{ topic: "deployment" }}
 					className="button"
 				>
-					Read the deployment guide ↗
+					Read the deployment guide <ArrowUpRight />
 				</Link>
 			</section>
 		</>

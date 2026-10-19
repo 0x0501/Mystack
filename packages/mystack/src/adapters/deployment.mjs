@@ -2,12 +2,7 @@ import { replace, text } from "../template.mjs";
 
 export async function configureDeployment({ files, pkg, selection, name }) {
 	if (selection.deployment === "cloudflare") {
-		replace(
-			files,
-			"wrangler.jsonc",
-			'"name": "tanstack-starter"',
-			`"name": "${name}"`,
-		);
+		replace(files, "wrangler.jsonc", '"name": "mystack"', `"name": "${name}"`);
 		pkg.scripts["cf:typegen"] = "wrangler types";
 		return;
 	}

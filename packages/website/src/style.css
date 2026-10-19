@@ -21,6 +21,8 @@
 	--body: 18px;
 	--small: 14px;
 	--heading: clamp(46px, 5.4vw, 82px);
+	--masthead-height: 91px;
+	--navigation-height: 80px;
 	--ease: cubic-bezier(0.22, 1, 0.36, 1);
 	font-family: "Hanken Grotesk", sans-serif;
 	color: var(--ink);
@@ -122,6 +124,13 @@ main,
 	pointer-events: none;
 	z-index: 0;
 }
+/* Where the machine is framed: the world below the header, so the header never
+   covers it. The poster is placed in this box and the renderer reads it. */
+.mechanical-stage {
+	position: absolute;
+	inset: calc(var(--masthead-height) + var(--navigation-height)) 0 0;
+	container-type: size;
+}
 
 .mechanical-canvas {
 	position: absolute;
@@ -130,55 +139,22 @@ main,
 	height: 100%;
 	opacity: 0;
 }
+/* The poster is a still frame of the renderer (scripts/build-posters.ts) and its
+   box comes from the WebGL camera (services/stage.ts), so the canvas replaces it
+   without the machine changing. */
 .mechanical-poster {
 	position: absolute;
-	left: 34%;
-	top: 12%;
-	width: 68%;
-	height: 80%;
-	object-fit: contain;
-	opacity: 0.8;
+	left: var(--poster-left);
+	top: var(--poster-top);
+	width: var(--poster-width);
+	height: var(--poster-height);
+	opacity: 0.9;
 }
 .mechanical-world[data-renderer="webgl"] .mechanical-canvas {
 	opacity: 0.9;
 }
-:where(.mechanical-world[data-renderer="webgl"]) .mechanical-poster {
-	visibility: hidden;
-}
-.art-left .mechanical-poster {
-	left: -4%;
-}
-.scene-note {
-	position: fixed;
-	z-index: 1;
-	bottom: 28px;
-	width: 310px;
-	padding: 14px;
-	background: rgb(16 17 15 / 0.94);
-	font-size: 14px;
-	pointer-events: none;
-}
-.note-right {
-	right: 5vw;
-}
-.note-left {
-	left: 5vw;
-}
-.scene-note strong {
-	font-size: 18px;
-	font-weight: 500;
-}
-.scene-note p {
-	margin-top: 7px;
-	color: var(--secondary);
-}
-.mechanism-phase {
-	display: block;
-	margin-top: 12px;
-	color: var(--accent);
-}
-.mechanism-description {
-	display: none;
+.mechanical-world[data-renderer="webgl"] .mechanical-poster {
+	opacity: 0;
 }
 .art-left
 	main
@@ -214,6 +190,7 @@ main,
 	align-items: center;
 	justify-content: space-between;
 	gap: 30px;
+	height: var(--masthead-height);
 	padding: 28px var(--pad) 20px;
 }
 .wordmark {
@@ -230,6 +207,7 @@ main,
 }
 .masthead p {
 	margin-left: auto;
+	white-space: nowrap;
 	color: var(--secondary);
 	font-size: var(--small);
 	line-height: 1.35;
@@ -241,6 +219,7 @@ main,
 .navigation {
 	display: flex;
 	gap: 35px;
+	height: var(--navigation-height);
 	padding: 18px var(--pad);
 }
 .navigation a {
@@ -269,9 +248,18 @@ main,
 .button:active {
 	transform: scale(0.97);
 }
-.button > span {
-	font-size: 28px;
-	line-height: 1;
+.arrow-icon {
+	width: 0.85em;
+	height: 0.85em;
+	margin-left: 0.2em;
+	vertical-align: -0.05em;
+	flex: none;
+}
+.button > .arrow-icon {
+	width: 28px;
+	height: 28px;
+	margin-left: 0;
+	vertical-align: baseline;
 }
 .text-link {
 	display: inline-block;
@@ -758,6 +746,7 @@ thead {
 		--heading: 48px;
 	}
 	.masthead {
+		height: auto;
 		padding-top: 25px;
 		gap: 20px;
 	}
@@ -777,6 +766,7 @@ thead {
 	}
 	.navigation {
 		display: grid;
+		height: auto;
 		grid-template-columns: 1fr 1fr;
 		gap: 6px 24px;
 		padding-top: 12px;
@@ -935,9 +925,21 @@ thead {
 		font-size: 40px;
 	}
 }
+@keyframes page-enter {
+	from {
+		opacity: 0;
+		transform: translateY(18px);
+	}
+}
+main {
+	animation: page-enter 520ms var(--ease) backwards;
+}
 @media (prefers-reduced-motion: reduce) {
 	html {
 		scroll-behavior: auto;
+	}
+	main {
+		animation: none;
 	}
 	.button,
 	.option {
@@ -946,26 +948,16 @@ thead {
 }
 
 @media (max-width: 760px) {
-	.mechanical-poster,
-	.art-left .mechanical-poster {
-		left: -6%;
-		top: 25%;
-		width: 112%;
-		height: 68%;
+	/* The narrow header is taller and the machine sits below the copy, so the
+	   stage is the whole screen. */
+	.mechanical-stage {
+		top: 0;
 	}
-	.scene-note {
-		display: none;
-	}
-	.mechanism-description {
-		display: block;
-		margin-top: 22px;
-		font-size: 14px;
-		color: var(--secondary);
-		background: var(--ground);
-	}
-	.mechanism-description strong {
-		font-weight: 500;
-		color: var(--ink);
+	.mechanical-poster {
+		left: var(--poster-mobile-left);
+		top: var(--poster-mobile-top);
+		width: var(--poster-mobile-width);
+		height: var(--poster-mobile-height);
 	}
 	.art-left
 		main
@@ -991,14 +983,4 @@ thead {
 .masthead,
 .navigation {
 	background: rgb(16 17 15 / 0.96);
-}
-.mechanism-phase[hidden] {
-	display: none;
-}
-
-@media (max-width: 760px) {
-	.document .mechanism-description {
-		font-size: 14px;
-		line-height: 1.55;
-	}
 }
