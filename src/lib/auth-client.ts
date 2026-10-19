@@ -9,11 +9,11 @@ import { createAuthClient } from "better-auth/react";
 // Type-only import: a value import would drag server-only code into the client.
 import type { auth } from "@/lib/auth";
 import { localizedAuthPath } from "@/utils/auth-redirect";
-import { ac, admin, superadmin, user } from "./permissions";
+import { ac, admin, user } from "./permissions";
 
 export const authClient = createAuthClient({
 	plugins: [
-		adminClient({ ac, roles: { admin, superadmin, user } }),
+		adminClient({ ac, roles: { admin, user } }),
 		oauthProviderClient(),
 		passkeyClient(),
 		twoFactorClient({

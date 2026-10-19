@@ -43,8 +43,8 @@ const TWO_FACTOR_PATHS = [
 
 /**
  * The whole admin plugin surface. These routes check nothing but
- * `hasPermission`, so a plain admin holding `user:set-role` could demote a
- * superadmin over HTTP. Admin UI goes through `auth.api.*` and server fns.
+ * `hasPermission`, so an admin holding `user:set-role` could demote another
+ * administrator over HTTP. Admin UI goes through `auth.api.*` and server fns.
  */
 const ADMIN_PATHS = [
 	"/admin/set-role",

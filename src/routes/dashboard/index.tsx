@@ -86,7 +86,7 @@ function DashboardOverview() {
 					</Link>
 					.
 				</p>
-				{u.role === "admin" || u.role === "superadmin" ? (
+				{u.role === "admin" ? (
 					<p>
 						<Link to="/admin/users" className={linkClass}>
 							{m.dashboard_open_admin()}

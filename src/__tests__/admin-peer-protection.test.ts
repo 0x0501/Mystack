@@ -1,7 +1,6 @@
 /**
  * Administrators are peers: none may ban, demote, or revoke credentials of an
- * admin or superadmin, and none may change their own role. superadmin is a
- * protected label, not a higher-privilege tier.
+ * admin, and none may change their own role.
  *
  * Last-admin checks hit real (temp) user rows — pure role matrices alone cannot
  * prove the SQL count.
@@ -35,19 +34,19 @@ describe("administrator peer protection", () => {
 		expect(() => act({ revokingCredentials: true })).not.toThrow();
 	});
 
-	for (const peerRole of ["admin", "superadmin"] as const) {
+	describe("admin peers", () => {
 		const act = (extra: Record<string, unknown>) =>
 			assertAdminMayActOn({
 				actorId: ACTOR,
 				targetId: TARGET,
-				targetRole: peerRole,
+				targetRole: "admin",
 				...extra,
 			});
 
 		// A bare Error would reach the client without a status, so the query
 		// client's "a 4xx is a refusal, not a flake" rule would miss it and retry
 		// a decision that can never change.
-		it(`refuses to ban a ${peerRole} with a 403`, () => {
+		it("refuses to ban an admin with a 403", () => {
 			expect(() => act({ banning: true })).toThrow(HttpError);
 			try {
 				act({ banning: true });
@@ -58,24 +57,24 @@ describe("administrator peer protection", () => {
 			}
 		});
 
-		it(`refuses to demote a ${peerRole}`, () => {
+		it("refuses to demote an admin", () => {
 			expect(() => act({ nextRole: "user" })).toThrow(/administrator/i);
 		});
 
-		it(`refuses to revoke a ${peerRole}'s credentials`, () => {
+		it("refuses to revoke an admin's credentials", () => {
 			expect(() => act({ revokingCredentials: true })).toThrow(
 				/administrator/i,
 			);
 		});
 
-		it(`still lets a ${peerRole} be unbanned`, () => {
+		it("still lets an admin be unbanned", () => {
 			expect(() => act({ banning: false })).not.toThrow();
 		});
 
-		it(`leaves a ${peerRole}'s other fields editable`, () => {
+		it("leaves an admin's other fields editable", () => {
 			expect(() => act({})).not.toThrow();
 		});
-	}
+	});
 
 	it("refuses an administrator changing their own role", () => {
 		expect(() =>
@@ -99,9 +98,9 @@ describe("administrator peer protection", () => {
 		).not.toThrow();
 	});
 
-	it("treats admin and superadmin as administrator roles", () => {
+	it("recognizes only admin as an administrator role", () => {
 		expect(isAdminRole("admin")).toBe(true);
-		expect(isAdminRole("superadmin")).toBe(true);
+		expect(isAdminRole("superadmin")).toBe(false);
 		expect(isAdminRole("user")).toBe(false);
 		expect(isAdminRole(null)).toBe(false);
 	});
@@ -142,21 +141,21 @@ const seed = (db: AppDatabase, rows: Array<[string, string | null, boolean]>) =>
 	);
 
 describe.skipIf(!hasTestDatabase)("the last usable administrator", () => {
-	it("counts a superadmin as an administrator", async () => {
+	it("allows removal when another usable admin exists", async () => {
 		const db = await makeUserTable();
 		await seed(db, [
 			["a1", "admin", false],
-			["s1", "superadmin", false],
+			["a2", "admin", false],
 		]);
 
 		await expect(assertNotLastAdmin(db, "a1")).resolves.toBeUndefined();
 	});
 
-	it("refuses when the only other administrator is a banned superadmin", async () => {
+	it("refuses when the only other administrator is a banned admin", async () => {
 		const db = await makeUserTable();
 		await seed(db, [
 			["a1", "admin", false],
-			["s1", "superadmin", true],
+			["a2", "admin", true],
 		]);
 
 		await expect(assertNotLastAdmin(db, "a1")).rejects.toThrow(
@@ -167,11 +166,12 @@ describe.skipIf(!hasTestDatabase)("the last usable administrator", () => {
 	it("refuses when the target is the only administrator left", async () => {
 		const db = await makeUserTable();
 		await seed(db, [
-			["s1", "superadmin", false],
+			["a2", "admin", false],
 			["u1", "user", false],
+			["s1", "superadmin", false],
 		]);
 
-		await expect(assertNotLastAdmin(db, "s1")).rejects.toThrow(
+		await expect(assertNotLastAdmin(db, "a2")).rejects.toThrow(
 			/last administrator/i,
 		);
 	});

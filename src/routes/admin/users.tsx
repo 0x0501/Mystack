@@ -143,7 +143,7 @@ function AdminUsersPage() {
 									</td>
 									<td className="px-3 py-2">
 										<div className="flex flex-wrap gap-2">
-											{row.role !== "superadmin" && row.role !== "admin" ? (
+											{row.role !== "admin" ? (
 												<button
 													type="button"
 													className={`${buttonClass} h-8 w-auto px-2 text-xs`}

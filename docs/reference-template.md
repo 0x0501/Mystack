@@ -23,7 +23,7 @@ cp .env.example .env
 # placeholder, so a deploy can never inherit it.
 bun run db:up          # Postgres 17 + starter_app role (.env.docker)
 bun run db:migrate     # drizzle migrations via DATABASE_MIGRATION_URL
-bun run db:seed        # local superadmin + user (optional)
+bun run db:seed        # local admin + user (optional)
 bun run dev
 ```
 
@@ -85,7 +85,7 @@ bun run db:seed
 
 ### Local seed users
 
-After migrations, seed a **superadmin** and a **user** (verified email/password) for local sign-in:
+After migrations, seed an **admin** and a **user** (verified email/password) for local sign-in:
 
 ```bash
 bun run db:seed
@@ -98,20 +98,20 @@ Defaults (override with `SEED_*` env vars — see `.env.example`):
 
 | Role | Email | Password |
 |------|--------|----------|
-| `superadmin` | `admin@localhost.dev` | `AdminPass1!` |
+| `admin` | `admin@localhost.dev` | `AdminPass1!` |
 | `user` | `user@localhost.dev` | `UserPass1!` |
 
 Idempotent: re-running updates role, name, verified flag, and password hash. Refuses non-local `DATABASE_MIGRATION_URL` unless `SEED_FORCE=1`.
 
-### First Superadmin (production / shared DB)
+### First Admin (production / shared DB)
 
 There is **no** env auto-promotion. After you have a normal user row, promote with SQL:
 
 ```sql
-UPDATE "user" SET role = 'superadmin' WHERE email = 'you@example.com';
+UPDATE "user" SET role = 'admin' WHERE email = 'you@example.com';
 ```
 
-Roles: `user` | `admin` | `superadmin`. Superadmin is a protected peer label, not a higher capability tier.
+Roles: `user` | `admin`. Admin is the sole administrator role, with peer protection.
 
 ## Auth
 

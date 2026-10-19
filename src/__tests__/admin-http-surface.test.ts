@@ -2,7 +2,7 @@
  * Peer protection must hold against Better Auth's own HTTP surface, not only
  * server functions. The admin plugin mounts `/admin/*` routes that check
  * `hasPermission` alone — without disabledPaths, a console fetch could demote
- * a superadmin. Server-side `auth.api.*` still reaches those endpoints.
+ * an administrator. Server-side `auth.api.*` still reaches those endpoints.
  *
  * Also measures DISABLED_AUTH_PATHS against routes plugins actually mount so a
  * plugin upgrade cannot silently remount a surface believed closed.
@@ -16,7 +16,7 @@ import { betterAuth } from "better-auth";
 import { admin, emailOTP, twoFactor } from "better-auth/plugins";
 import { describe, expect, it } from "vitest";
 import { DISABLED_AUTH_PATHS } from "@/lib/auth-paths";
-import { ac, admin as adminRole, superadmin, user } from "@/lib/permissions";
+import { ac, admin as adminRole, user } from "@/lib/permissions";
 import {
 	AUTH_DDL,
 	cookieHeaders,
@@ -40,7 +40,7 @@ async function makeAuth() {
 		plugins: [
 			admin({
 				ac,
-				roles: { admin: adminRole, superadmin, user },
+				roles: { admin: adminRole, user },
 			}),
 		],
 	});
@@ -101,10 +101,10 @@ const post = (
 	);
 
 describe.skipIf(!hasTestDatabase)("the admin plugin's HTTP surface", () => {
-	it("does not let an administrator demote a superadmin", async () => {
+	it("does not let an administrator demote a peer", async () => {
 		const { auth, db } = await makeAuth();
 		const actor = await signedInAs(auth, db, "admin@test.local", "admin");
-		const target = await signedInAs(auth, db, "root@test.local", "superadmin");
+		const target = await signedInAs(auth, db, "peer@test.local", "admin");
 
 		const res = await post(
 			auth,
@@ -114,17 +114,17 @@ describe.skipIf(!hasTestDatabase)("the admin plugin's HTTP surface", () => {
 		);
 
 		expect(res.status).not.toBe(200);
-		expect((await roleOf(db, target.id)).role).toBe("superadmin");
+		expect((await roleOf(db, target.id)).role).toBe("admin");
 	});
 
-	it("does not let an administrator promote themselves", async () => {
+	it("does not let an administrator change their own role", async () => {
 		const { auth, db } = await makeAuth();
 		const actor = await signedInAs(auth, db, "admin@test.local", "admin");
 
 		const res = await post(
 			auth,
 			"/admin/set-role",
-			{ userId: actor.id, role: "superadmin" },
+			{ userId: actor.id, role: "user" },
 			actor.headers,
 		);
 
@@ -213,7 +213,7 @@ describe.skipIf(!hasTestDatabase)("the disabled-path list", () => {
 
 		// No api-key plugin — not a Starter platform default.
 		const managed = [
-			["admin", admin({ ac, roles: { admin: adminRole, superadmin, user } })],
+			["admin", admin({ ac, roles: { admin: adminRole, user } })],
 			["two-factor", twoFactor()],
 			["email-otp", emailOTP({ async sendVerificationOTP() {} })],
 		] as const;
