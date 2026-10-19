@@ -1,4 +1,5 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
+import { ArrowUpRight } from "../components/arrow-up-right";
 import { CodeBlock } from "../components/shell";
 import {
 	type DocumentTopic,
@@ -62,7 +63,9 @@ function Document() {
 				))}
 				<div className="document-bottom">
 					<Link to="/quick-start">Quick start</Link>
-					<Link to="/integrations">Build your stack ↗</Link>
+					<Link to="/integrations">
+						Build your stack <ArrowUpRight />
+					</Link>
 				</div>
 			</article>
 		</div>
