@@ -40,7 +40,6 @@ export const updateUser = createServerFn({ method: "POST" })
 			z.object({
 				userId: z.string().min(1),
 				emailVerified: z.boolean(),
-				// Superadmin role is not assignable from UI (SQL bootstrap only).
 				role: z.enum(["user", "admin"]).optional(),
 				banned: z.boolean(),
 			}),

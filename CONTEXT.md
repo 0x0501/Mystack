@@ -49,12 +49,8 @@ An authenticated account with the default member role. Accesses the user dashboa
 _Avoid_: member, customer, account (when the person/role is meant).
 
 **Admin**:
-An administrator role with full access to the admin console and the same operational capabilities as Superadmin.
-_Avoid_: operator, staff, moderator (unless a product domain introduces them).
-
-**Superadmin**:
-A protected administrator label, not a higher-privilege role. Capability-identical to Admin; no administrator may ban, demote, or revoke credentials of an Admin or Superadmin, nor change their own role. Authority lives only on Better Auth's `user.role`; there is no separate admin membership table. First Superadmin is granted by operator-run SQL against the database (SQL editor or local psql), not by env auto-promotion or first-user-wins.
-_Avoid_: root, god user, super user (as a separate permission tier); dual-write admin tables; runtime bootstrap email lists as the Starter default.
+The sole administrator role, with full access to the admin console. No administrator may ban, demote, or revoke credentials of another Admin, nor change their own role. Authority lives only on Better Auth's `user.role`; there is no separate admin membership table. The first Admin is granted by operator-run SQL against the database (SQL editor or local psql), not by env auto-promotion or first-user-wins.
+_Avoid_: operator, staff, moderator (unless a product domain introduces them); additional administrator tiers; dual-write admin tables; runtime bootstrap email lists as the Starter default.
 
 **Verified email**:
 Every account has exactly one verified email used as the delivery channel for notification-dependent flows. Social sign-in fails closed if the provider does not supply a verified email.
@@ -151,8 +147,8 @@ Signed-in member shell under `/dashboard` (locale prefix wraps the path under fu
 _Avoid_: admin backend; fake SaaS KPI widgets; separate `/security` route as the Starter default; unlocalized or path-neutral dashboard.
 
 **Admin console**:
-Administrator shell under `/admin` (locale prefix wraps the path under full-app URL i18n): Users, Audit Log, and OAuth Apps. Reachable by Admin and Superadmin alike.
-_Avoid_: superadmin-only backend as a second product; CMS; unlocalized or path-neutral admin.
+Administrator shell under `/admin` (locale prefix wraps the path under full-app URL i18n): Users, Audit Log, and OAuth Apps. Reachable by Admin.
+_Avoid_: separate administrator tiers; CMS; unlocalized or path-neutral admin.
 
 **Headless UI**:
 Interaction and platform behavior are independent of visual identity. Base UI owns composite interaction semantics; replaceable CSS and page composition own appearance. A default skin makes platform flows usable out of the box. Headless does not mean minimalist or prohibit branding, tokens, or motion. See `DESIGN.md`.
@@ -215,7 +211,7 @@ The product fulfillment extension point after a Purchase is confirmed paid. Post
 _Avoid_: wallet credit handler as Starter default; product-specific settlement logic; HTTP calls or email sends inside the hook; describing delivery as "at most once" (the flip alone was that, and it lost deliveries).
 
 **Payment method toggle**:
-A superadmin/admin switch that enables or disables each payment provider adapter independently at runtime; default all on when configured. A disabled provider is refused server-side, not merely hidden from the UI.
+An admin switch that enables or disables each payment provider adapter independently at runtime; default all on when configured. A disabled provider is refused server-side, not merely hidden from the UI.
 _Avoid_: UI-only hide without server enforcement.
 
 **Audit log**:
@@ -247,7 +243,7 @@ _Avoid_: request log; every sign-in as an audit row.
 - UI is Headless: Base UI owns composite interactions; the default theme/layout/motion are replaceable. No visual style or animation approach is mandatory. Accessibility and platform flow contracts survive customization.
 - User-facing pages are full-app i18n (messages + URL prefixes for public, auth, dashboard, admin; en/de in-tree); `/api` and `/.well-known` stay unprefixed; signed-in locale preference is stored on the user.
 - Auth pages expose the same capabilities the server enables (Turnstile, GitHub, passkey) when those are configured — UI must not lag plugins.
-- First Superadmin is created by operator SQL on `user.role`, not by open registration races.
+- First Admin is created by operator SQL on `user.role`, not by open registration races.
 - Platform package versions are pinned; hygiene checks guard server-fn methods, raw SQL, and client-bundle boundaries.
 
 ## Deliberate non-goals

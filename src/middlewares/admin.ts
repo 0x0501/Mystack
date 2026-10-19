@@ -28,7 +28,7 @@ async function can(
 	return Boolean(res?.success);
 }
 
-/** Admin console gate: roles holding `config:manage` (admin / superadmin). */
+/** Admin console gate: roles holding `config:manage` (admin). */
 export const adminMiddleware = createMiddleware()
 	.middleware([protectedMiddleware])
 	.server(async ({ next, context }) => {

@@ -258,7 +258,7 @@ Product-domain suites (gateway, wallet, referral, tokenizer, containers) stay ou
 - Adopting Sentry or full CSP product allowlists as mandatory if not yet chosen — patterns may be stubbed; full observability productization is optional follow-up.
 - Changing the in-tree locale pair away from `en`/`de`.
 - Requiring a specific product brand or marketing design as the template default. Products may add their own design systems, marketing pages, and animated controls.
-- Multi-email transports, SQLite/D1, subscription billing product, env-based auto Superadmin.
+- Multi-email transports, SQLite/D1, subscription billing product, env-based auto Admin.
 - Perfect visual parity with the private reference’s marketing chrome.
 
 ---

@@ -291,7 +291,7 @@ CREATE INDEX "verification_identifier_idx" ON "verification" USING btree ("ident
 CREATE INDEX "admin_action_created_idx" ON "admin_action" USING btree ("created_at" DESC NULLS LAST);--> statement-breakpoint
 CREATE UNIQUE INDEX "purchase_provider_external_uq" ON "purchase" USING btree ("provider","external_id");--> statement-breakpoint
 CREATE INDEX "purchase_userId_idx" ON "purchase" USING btree ("user_id");--> statement-breakpoint
--- is_admin(): service GUC bypass OR user.role in (admin, superadmin).
+-- is_admin(): service GUC bypass OR user.role = admin.
 -- Must live after "user" exists — SQL functions validate relations at CREATE.
 CREATE OR REPLACE FUNCTION app_private.is_admin()
 RETURNS boolean
@@ -305,7 +305,7 @@ AS $$
         SELECT 1
         FROM public."user" AS u
         WHERE u.id = app_private.current_user_id()
-        AND u.role IN ('admin', 'superadmin')
+        AND u.role = 'admin'
     );
 $$;
 

@@ -37,7 +37,7 @@ import {
 	sendVerificationEmail,
 } from "./email";
 import { issuerFromAuthUrl } from "./oauth-metadata";
-import { ac, admin as adminRole, superadmin, user } from "./permissions";
+import { ac, admin as adminRole, user } from "./permissions";
 import { userUpdateGuard } from "./user-update-guard";
 
 export { ACCESS_TOKEN_TTL_SEC } from "./auth-timing";
@@ -236,7 +236,7 @@ export function createAuth(db: Database) {
 				: []),
 			admin({
 				ac,
-				roles: { admin: adminRole, superadmin, user },
+				roles: { admin: adminRole, user },
 			}),
 			twoFactor({
 				issuer: TWO_FACTOR_ISSUER,

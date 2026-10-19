@@ -11,7 +11,7 @@
  *   SEED_ADMIN_EMAIL         default admin@localhost.dev
  *   SEED_ADMIN_PASSWORD      default AdminPass1!
  *   SEED_ADMIN_NAME          default Local Admin
- *   SEED_ADMIN_ROLE          default superadmin  (admin | superadmin)
+ *   SEED_ADMIN_ROLE          default admin  (user | admin)
  *   SEED_USER_EMAIL          default user@localhost.dev
  *   SEED_USER_PASSWORD       default UserPass1!
  *   SEED_USER_NAME           default Local User
@@ -36,7 +36,7 @@ const DEFAULTS = {
 		email: "admin@localhost.dev",
 		password: "AdminPass1!",
 		name: "Local Admin",
-		role: "superadmin" as const,
+		role: "admin" as const,
 	},
 	user: {
 		email: "user@localhost.dev",
@@ -46,7 +46,7 @@ const DEFAULTS = {
 	},
 } as const;
 
-type SeedRole = "user" | "admin" | "superadmin";
+type SeedRole = "user" | "admin";
 
 type SeedSpec = {
 	email: string;
@@ -101,9 +101,9 @@ function assertLocalDbUrl(url: string): void {
 }
 
 function parseRole(raw: string): SeedRole {
-	if (raw === "user" || raw === "admin" || raw === "superadmin") return raw;
+	if (raw === "user" || raw === "admin") return raw;
 	throw new Error(
-		`Invalid SEED_ADMIN_ROLE "${raw}". Use user | admin | superadmin.`,
+		`Invalid SEED_ADMIN_ROLE "${raw}". Use user | admin.`,
 	);
 }
 
@@ -212,7 +212,7 @@ Usage:
   bun run db:seed -- --user-only
 
 Defaults:
-  Superadmin  ${DEFAULTS.admin.email}  /  ${DEFAULTS.admin.password}
+  Admin       ${DEFAULTS.admin.email}  /  ${DEFAULTS.admin.password}
   User        ${DEFAULTS.user.email}   /  ${DEFAULTS.user.password}
 
 Requires DATABASE_MIGRATION_URL (direct Postgres, same as drizzle migrate).

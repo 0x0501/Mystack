@@ -50,7 +50,7 @@ Package manager is **bun**.
 | `bun run db:up` / `db:down` / `db:reset` | Local Postgres container from `.env.docker` (`db:reset` wipes the volume) |
 | `bun run db:generate` | Generate Drizzle migrations into `./drizzle` |
 | `bun run db:migrate` / `db:push` | Apply migrations / push schema to Postgres |
-| `bun run db:seed` | Seed a local superadmin + user |
+| `bun run db:seed` | Seed a local admin + user |
 | `bun run db:studio` | Drizzle Studio |
 
 ## Environment

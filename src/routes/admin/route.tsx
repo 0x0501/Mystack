@@ -14,7 +14,7 @@ export const Route = createFileRoute("/admin")({
 	// keep using `isAdminRole`; this one line is chrome.
 	beforeLoad: ({ context: { session } }) => {
 		if (!session?.user) throw redirect({ to: "/sign-in" });
-		if (!["admin", "superadmin"].includes(session.user.role ?? "")) {
+		if (session.user.role !== "admin") {
 			throw redirect({ to: "/dashboard" });
 		}
 		return { session };

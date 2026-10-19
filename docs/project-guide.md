@@ -55,7 +55,7 @@ For production, use the root README's instructions for your selected runtime. `b
 Supply real application origins, a new auth secret, database credentials/resource IDs, email credentials and selected webhook signature secrets. Auth registration creates ordinary users; promote the first administrator through an operator-controlled database action, never open registration. For PostgreSQL, after creating the normal user:
 
 ```sql
-UPDATE "user" SET role = 'superadmin' WHERE email = 'you@example.com';
+UPDATE "user" SET role = 'admin' WHERE email = 'you@example.com';
 ```
 
 Use the equivalent SQL through your selected database's administrative tool for SQLite. Each generated application is owned and maintained independently; the CLI is a creation tool, not an upgrade or runtime dependency.

@@ -1,12 +1,11 @@
 /**
  * Peer-protection guards for administrator mutations.
  *
- * `admin` and `superadmin` hold the same capabilities — superadmin is a
- * protected label, not a higher tier. Neither may ban, demote, or revoke
- * credentials of an administrator; nobody may change their own role.
+ * Administrators may not ban, demote, or revoke credentials of another
+ * administrator; nobody may change their own role.
  */
 
-import { and, count, eq, inArray, isNull, ne, or } from "drizzle-orm";
+import { and, count, eq, isNull, ne, or } from "drizzle-orm";
 import type { Database } from "@/db";
 import {
 	adminAction,
@@ -18,10 +17,8 @@ import {
 } from "@/db/schema";
 import { HttpError } from "@/utils/api-error";
 
-const ADMIN_ROLES = ["admin", "superadmin"] as const;
-
 export function isAdminRole(role: string | null | undefined): boolean {
-	return role === "admin" || role === "superadmin";
+	return role === "admin";
 }
 
 /**
@@ -48,7 +45,7 @@ export async function revokeUserCredentials(
 }
 
 /**
- * Throw if `userId` is the last remaining usable admin/superadmin.
+ * Throw if `userId` is the last remaining usable admin.
  */
 export async function assertNotLastAdmin(
 	db: Database,
@@ -59,7 +56,7 @@ export async function assertNotLastAdmin(
 		.from(user)
 		.where(
 			and(
-				inArray(user.role, [...ADMIN_ROLES]),
+				eq(user.role, "admin"),
 				ne(user.id, userId),
 				or(eq(user.banned, false), isNull(user.banned)),
 			),
@@ -104,7 +101,6 @@ export async function logAdminAction(
 
 /**
  * Who may create, read, update and delete OAuth clients.
- * Both administrator roles are capability-identical.
  */
 export function canManageOAuthClients(user: unknown): boolean {
 	if (!user || typeof user !== "object") return false;
@@ -160,5 +156,3 @@ export function assertAdminMayActOn(args: {
 		});
 	}
 }
-
-export { ADMIN_ROLES };

@@ -74,47 +74,53 @@ describe.skipIf(!hasTestDatabase)(
 			expect(rows).toHaveLength(1);
 		});
 
-		it("hides audit rows from an ordinary user under withRlsUser", async () => {
-			const db = createRlsAppDatabase();
-			const memberId = await seedUser(db, "user");
-			const adminId = await seedUser(db, "admin");
-			const actionId = crypto.randomUUID();
+		it.each(["user", "superadmin"])(
+			"hides audit rows from role %s under withRlsUser",
+			async (role) => {
+				const db = createRlsAppDatabase();
+				const memberId = await seedUser(db, role);
+				const adminId = await seedUser(db, "admin");
+				const actionId = crypto.randomUUID();
 
-			await withRlsService(db, (tx) =>
-				tx.insert(adminAction).values({
-					id: actionId,
-					actorId: adminId,
-					action: "user.ban",
-					targetType: "user",
-					targetId: memberId,
-				}),
-			);
-
-			const rows = await withRlsUser(db, memberId, (tx) =>
-				tx.select().from(adminAction).where(eq(adminAction.id, actionId)),
-			);
-			expect(rows).toHaveLength(0);
-		});
-
-		it("rejects ordinary-user writes to admin_action", async () => {
-			const db = createRlsAppDatabase();
-			const memberId = await seedUser(db, "user");
-			const actionId = crypto.randomUUID();
-
-			await expect(
-				withRlsUser(db, memberId, (tx) =>
+				await withRlsService(db, (tx) =>
 					tx.insert(adminAction).values({
 						id: actionId,
-						actorId: memberId,
-						action: "forged.action",
+						actorId: adminId,
+						action: "user.ban",
+						targetType: "user",
+						targetId: memberId,
 					}),
-				),
-			).rejects.toThrow();
+				);
 
-			const rows = await withRlsService(db, (tx) =>
-				tx.select().from(adminAction).where(eq(adminAction.id, actionId)),
-			);
-			expect(rows).toHaveLength(0);
-		});
+				const rows = await withRlsUser(db, memberId, (tx) =>
+					tx.select().from(adminAction).where(eq(adminAction.id, actionId)),
+				);
+				expect(rows).toHaveLength(0);
+			},
+		);
+
+		it.each(["user", "superadmin"])(
+			"rejects writes to admin_action from role %s",
+			async (role) => {
+				const db = createRlsAppDatabase();
+				const memberId = await seedUser(db, role);
+				const actionId = crypto.randomUUID();
+
+				await expect(
+					withRlsUser(db, memberId, (tx) =>
+						tx.insert(adminAction).values({
+							id: actionId,
+							actorId: memberId,
+							action: "forged.action",
+						}),
+					),
+				).rejects.toThrow();
+
+				const rows = await withRlsService(db, (tx) =>
+					tx.select().from(adminAction).where(eq(adminAction.id, actionId)),
+				);
+				expect(rows).toHaveLength(0);
+			},
+		);
 	},
 );

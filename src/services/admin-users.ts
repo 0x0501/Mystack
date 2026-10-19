@@ -1,12 +1,12 @@
 /**
- * Admin user list + update. Starter roles only: user | admin | superadmin.
+ * Admin user list + update. Starter roles only: user | admin.
  */
 import { and, asc, count, desc, eq, ilike, or, type SQL } from "drizzle-orm";
 import type { Database } from "@/db";
 import { user } from "@/db/schema";
 import type { AdminAuditEntry } from "@/services/admin-security";
 
-export type AdminUserRole = "user" | "admin" | "superadmin";
+export type AdminUserRole = "user" | "admin";
 
 export type ListAdminUsersParams = {
 	page: number;
@@ -28,11 +28,7 @@ export async function listAdminUsers(
 		const m = or(ilike(user.email, q), ilike(user.name, q));
 		if (m) conds.push(m);
 	}
-	if (
-		filters.role === "user" ||
-		filters.role === "admin" ||
-		filters.role === "superadmin"
-	) {
+	if (filters.role === "user" || filters.role === "admin") {
 		conds.push(eq(user.role, filters.role));
 	}
 	if (filters.banned === "true" || filters.banned === "false") {

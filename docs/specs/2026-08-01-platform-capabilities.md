@@ -22,7 +22,7 @@ A TanStack Start + Cloudflare Workers scaffold should be a cloneable base for ne
 Ship a **generic SaaS Starter** that includes:
 
 1. **Hardened Better Auth** — email/password, GitHub, 2FA, passkey, OAuth/OIDC **issuer**, Turnstile, disabled dangerous plugin HTTP routes, account-security server flows.
-2. **Roles** — `user` / `admin` / `superadmin` with peer protection; authority on `user.role`; first Superadmin via SQL.
+2. **Roles** — `user` / `admin` with peer protection; authority on `user.role`; first Admin via SQL.
 3. **Postgres + Hyperdrive** with an **RLS skeleton** (no sqlite).
 4. **Cloudflare Email** + react-email templates (brand via env).
 5. **Optional payment provider adapters** (Stripe, Creem, NowPayments) → **Purchase** + **purchase-paid hook** (no wallet, no subscription product).
@@ -43,7 +43,7 @@ Ship a **generic SaaS Starter** that includes:
 - Multi-email production transports (Resend, SMTP).
 - SQLite / D1 dual support.
 - Separate admin membership table or dual-write roles.
-- Env/first-user automatic Superadmin promotion.
+- Env/first-user automatic Admin promotion.
 - Full auth SIEM.
 - A mandatory product brand or visual style; clones own their design.
 - zh locales as Starter defaults (clones may add; in-tree is en+de).
