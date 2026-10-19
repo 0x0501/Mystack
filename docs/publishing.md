@@ -1,4 +1,4 @@
-# Publish Mystack to npm
+# Publish Mystack to npm and GitHub Releases
 
 Mystack is published as the public package `@0x0501/mystack`, owned by the personal npm account `0x0501`. The GitHub repository is `0x0501/mystack`. After the first stable release, users can open the wizard with:
 
@@ -12,6 +12,10 @@ bunx @0x0501/mystack@latest create my-app
 `.github/workflows/publish-mystack.yml` runs when a `v*` tag is pushed. It requires the tagged commit to be on `main` and the tag to equal `v` plus the version in `packages/mystack/package.json`. It calls the existing CI workflow before publishing: application checks, PostgreSQL tests, builds, generated-project verification and packaged CLI verification must all pass.
 
 The publishing job uses a GitHub-hosted runner, Node 24, npm 11 and OIDC with `id-token: write`. `prepack` rebuilds the template snapshot. Every successful tag-triggered release updates the `latest` distribution tag to the published version, including prereleases, through `npm publish --tag latest`. No npm token or GitHub environment is used. See [npm trusted publishing](https://docs.npmjs.com/trusted-publishers/).
+
+After npm publication succeeds, a separate `github-release` job creates a GitHub Release for the same tag, titled `Mystack v<version>`. It uses GitHub's [automatically generated release notes](https://docs.github.com/en/repositories/releasing-projects-on-github/automatically-generated-release-notes) to list merged pull requests, contributors and a link to the full changelog. Use descriptive PR titles so readers can understand what changed. Tags with a prerelease version, such as `v0.2.0-beta.1`, are marked as GitHub prereleases and do not replace the latest stable GitHub Release; the npm `latest` behavior above is unchanged.
+
+Only this Release job receives `contents: write`, using the built-in `GITHUB_TOKEN`; no extra secret is needed. An existing Release is left intact when the job is rerun, preserving any manually edited notes.
 
 ## Set up the personal npm account once
 
@@ -69,6 +73,8 @@ npm view @0x0501/mystack version
 bunx @0x0501/mystack@latest create my-app
 ```
 
+Open the repository's **Releases** page to read the automatically published update notes.
+
 ## Publish subsequent versions
 
 Update `packages/mystack/package.json`, commit the version change and merge it into `main`. For example:
@@ -84,4 +90,4 @@ git push origin v0.1.1
 
 If `main` requires pull requests, submit the version commit through a PR and tag the merged commit. A prerelease such as `0.2.0-beta.1` uses the matching `v0.2.0-beta.1` tag and also becomes `latest`.
 
-Published versions are immutable. A failed run before publication can be retried after correcting configuration; once a version is published, release a new version instead of moving or reusing its tag. See [npm versioning and publication](https://docs.npmjs.com/cli/v11/commands/npm-publish/).
+Published versions are immutable. A failed run before publication can be retried after correcting configuration. If npm publication succeeds but `github-release` fails, use **Re-run failed jobs** in GitHub Actions to retry only Release creation; do not rerun the successful npm job. For package changes after publication, release a new version instead of moving or reusing its tag. See [npm versioning and publication](https://docs.npmjs.com/cli/v11/commands/npm-publish/).

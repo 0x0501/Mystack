@@ -63,3 +63,27 @@ jobs:
       - name: Publish the CLI and its template snapshot
         working-directory: packages/mystack
         run: npm publish --access public --provenance --tag latest
+
+  github-release:
+    needs: publish
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Publish GitHub Release with generated notes
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          RELEASE_TAG: ${{ github.ref_name }}
+        run: |
+          if gh release view "$RELEASE_TAG" > /dev/null 2>&1; then
+            echo "Release $RELEASE_TAG already exists."
+            exit 0
+          fi
+
+          args=(--verify-tag --generate-notes --title "Mystack $RELEASE_TAG")
+          if [[ "${RELEASE_TAG%%+*}" == *-* ]]; then
+            args+=(--prerelease --latest=false)
+          fi
+
+          gh release create "$RELEASE_TAG" "${args[@]}"
