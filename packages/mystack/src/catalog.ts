@@ -1,5 +1,16 @@
+export type SingleCategory = "database" | "deployment" | "email";
+export type Category = SingleCategory | "payments";
+export type Selection = Record<SingleCategory, string> & { payments: string[] };
+
+interface CatalogOption {
+	id: string;
+	label: string;
+	hint?: string;
+	requires?: Partial<Record<SingleCategory, string[]>>;
+}
+
 // One catalog drives prompts, flag validation and adapter composition.
-export const catalog = {
+export const catalog: Record<Category, CatalogOption[]> = {
 	database: [
 		{
 			id: "pg",
@@ -57,16 +68,17 @@ export const catalog = {
 	],
 };
 
-export const defaults = {
+export const defaults: Selection = {
 	database: "pg-hyperdrive",
 	deployment: "cloudflare",
 	email: "cloudflare",
 	payments: ["stripe"],
 };
 
-export function incompatibilities(selection) {
+export function incompatibilities(selection: Partial<Selection>) {
 	const errors = [];
-	for (const [category, options] of Object.entries(catalog)) {
+	for (const category of Object.keys(catalog) as Category[]) {
+		const options = catalog[category];
 		const ids =
 			category === "payments"
 				? (selection.payments ?? [])
@@ -80,12 +92,14 @@ export function incompatibilities(selection) {
 				);
 				continue;
 			}
-			for (const [dependency, allowed] of Object.entries(
+			for (const dependency of Object.keys(
 				option.requires ?? {},
-			)) {
+			) as SingleCategory[]) {
+				const allowed = option.requires?.[dependency];
+				if (!allowed) continue;
 				if (selection[dependency] && !allowed.includes(selection[dependency])) {
 					errors.push(
-						`${option.label} requires ${allowed.map((id) => catalog[dependency].find((entry) => entry.id === id).label).join(" or ")}.`,
+						`${option.label} requires ${allowed.map((id) => catalog[dependency].find((entry) => entry.id === id)?.label).join(" or ")}.`,
 					);
 				}
 			}
@@ -94,7 +108,10 @@ export function incompatibilities(selection) {
 	return errors;
 }
 
-export function choices(category, selection) {
+export function choices(
+	category: SingleCategory,
+	selection: Partial<Selection>,
+) {
 	return catalog[category].map((option) => {
 		const reason = incompatibilities({
 			...selection,
@@ -109,12 +126,12 @@ export function choices(category, selection) {
 	});
 }
 
-export function isPostgres(database) {
+export function isPostgres(database: string) {
 	return database === "pg" || database === "pg-hyperdrive";
 }
 
-export function validateSelection(selection) {
-	for (const category of Object.keys(catalog)) {
+export function validateSelection(selection: Partial<Selection>): Selection {
+	for (const category of Object.keys(catalog) as Category[]) {
 		if (selection[category] === undefined)
 			throw new Error(`Missing ${category} selection.`);
 	}
@@ -124,5 +141,5 @@ export function validateSelection(selection) {
 		throw new Error("Duplicate payment providers.");
 	const errors = incompatibilities(selection);
 	if (errors.length) throw new Error(errors.join("\n"));
-	return selection;
+	return selection as Selection;
 }

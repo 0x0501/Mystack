@@ -17,21 +17,22 @@
 		"node": ">=22.12.0"
 	},
 	"bin": {
-		"mystack": "src/cli.mjs"
+		"mystack": "dist/cli.js"
 	},
 	"files": [
-		"src",
+		"dist",
 		"template",
 		"assets",
 		"README.md",
 		"LICENSE"
 	],
 	"scripts": {
-		"template:prepare": "node scripts/prepare-template.mjs",
-		"prepack": "npm run template:prepare",
+		"build": "tsc -p tsconfig.build.json",
+		"template:prepare": "bun scripts/prepare-template.ts",
+		"prepack": "bun run build && bun run template:prepare",
 		"test": "bun run --cwd ../.. test:cli",
-		"test:generated": "node scripts/verify-generated.mjs",
-		"test:packed": "node scripts/verify-packed.mjs"
+		"test:generated": "bun scripts/verify-generated.ts",
+		"test:packed": "bun scripts/verify-packed.ts"
 	},
 	"dependencies": {
 		"@biomejs/biome": "2.5.15",
@@ -41,5 +42,9 @@
 	"publishConfig": {
 		"access": "public",
 		"registry": "https://registry.npmjs.org"
+	},
+	"devDependencies": {
+		"@types/node": "^26.6.5",
+		"typescript": "^7.0.2"
 	}
 }

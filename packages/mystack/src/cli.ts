@@ -18,14 +18,16 @@ import {
 	text,
 } from "@clack/prompts";
 import {
+	type Category,
 	catalog,
 	choices,
 	defaults,
 	incompatibilities,
 	isPostgres,
+	type Selection,
 	validateSelection,
-} from "./catalog.mjs";
-import { createProject, validateName } from "./generate.mjs";
+} from "./catalog.ts";
+import { createProject, validateName } from "./generate.ts";
 
 const help = `mystack create [name] [options]
 
@@ -47,13 +49,17 @@ Turso Local needs a filesystem. Bun SQLite requires the Bun deployment.
 
 class PromptCancelled extends Error {}
 
-async function answer(prompt) {
+async function answer<T>(prompt: Promise<T>): Promise<Exclude<T, symbol>> {
 	const value = await prompt;
 	if (isCancel(value)) throw new PromptCancelled();
-	return value;
+	return value as Exclude<T, symbol>;
 }
 
-async function step(message, complete, task) {
+async function step<T>(
+	message: string,
+	complete: string,
+	task: (onProgress: (message: string) => void) => Promise<T>,
+) {
 	const progress = spinner();
 	progress.start(message);
 	try {
@@ -66,15 +72,15 @@ async function step(message, complete, task) {
 	}
 }
 
-export function installDependencies(target) {
-	return new Promise((resolveInstall, reject) => {
+export function installDependencies(target: string) {
+	return new Promise<void>((resolveInstall, reject) => {
 		const child = spawn("bun", ["install"], {
 			cwd: target,
 			stdio: ["ignore", "pipe", "pipe"],
 			shell: false,
 		});
 		let output = "";
-		const capture = (chunk) => {
+		const capture = (chunk: Buffer) => {
 			output = (output + chunk.toString()).slice(-16_384);
 		};
 		child.stdout.on("data", capture);
@@ -113,8 +119,8 @@ export async function main(args = process.argv.slice(2)) {
 		}
 		const [command = "create", projectName] = positionals;
 		if (command !== "create" || positionals.length > 2) throw new Error(help);
-		const selection = {};
-		for (const category of ["database", "deployment", "email"]) {
+		const selection: Partial<Selection> = {};
+		for (const category of ["database", "deployment", "email"] as const) {
 			if (values[category] !== undefined)
 				selection[category] = values[category];
 		}
@@ -134,13 +140,13 @@ export async function main(args = process.argv.slice(2)) {
 				? `Creating a new Mystack app in ${projectName ?? "my-app"}...`
 				: "Let's configure your Mystack application",
 		);
-		const checkName = (value) => {
+		const checkName = (value: string) => {
 			try {
 				validateName(value);
 				if (existsSync(resolve(value)))
 					return `Directory '${value}' already exists. Choose another project name.`;
 			} catch (error) {
-				return error.message;
+				return error instanceof Error ? error.message : String(error);
 			}
 		};
 		const name =
@@ -162,7 +168,7 @@ export async function main(args = process.argv.slice(2)) {
 			deployment: "Select deployment adapter:",
 			email: "Select email provider:",
 		};
-		for (const category of ["database", "deployment", "email"]) {
+		for (const category of ["database", "deployment", "email"] as const) {
 			if (selection[category] !== undefined) continue;
 			const options = choices(category, selection);
 			const preferred =
@@ -207,7 +213,7 @@ export async function main(args = process.argv.slice(2)) {
 				);
 			}
 		}
-		validateSelection(selection);
+		const validated = validateSelection(selection);
 		const install = values["no-install"]
 			? false
 			: values.yes
@@ -218,20 +224,20 @@ export async function main(args = process.argv.slice(2)) {
 							initialValue: true,
 						}),
 					);
-		const label = (category, id) =>
-			catalog[category].find((option) => option.id === id).label;
+		const label = (category: Category, id: string) =>
+			catalog[category].find((option) => option.id === id)?.label;
 		log.info(
 			`About to create:\n\n${[
 				["Project", name],
 				["Location", resolve(name)],
 				["Framework", "TanStack Start (React)"],
 				["Package manager", "Bun"],
-				["Database", label("database", selection.database)],
-				["Deploy", label("deployment", selection.deployment)],
-				["Email", label("email", selection.email)],
+				["Database", label("database", validated.database)],
+				["Deploy", label("deployment", validated.deployment)],
+				["Email", label("email", validated.email)],
 				[
 					"Payments",
-					selection.payments.map((id) => label("payments", id)).join(", ") ||
+					validated.payments.map((id) => label("payments", id)).join(", ") ||
 						"None",
 				],
 				["Install deps", install ? "yes" : "no"],
@@ -254,7 +260,7 @@ export async function main(args = process.argv.slice(2)) {
 		const target = await step(
 			"Creating project files...",
 			"Project files created",
-			(onProgress) => createProject({ name, selection, onProgress }),
+			(onProgress) => createProject({ name, selection: validated, onProgress }),
 		);
 		if (install) {
 			try {
@@ -264,7 +270,7 @@ export async function main(args = process.argv.slice(2)) {
 					() => installDependencies(target),
 				);
 			} catch (error) {
-				log.error(error.message);
+				log.error(error instanceof Error ? error.message : String(error));
 				note(
 					`Your project is saved at ${target}.\n\n% cd ${name}\n% bun install\n\nThen follow README.md to configure and start your app.`,
 					"Retry installation",
@@ -274,7 +280,7 @@ export async function main(args = process.argv.slice(2)) {
 			}
 		} else log.step("Dependency installation skipped");
 		outro(
-			`Your Mystack app is ready in '${name}'.\n\nUse the following commands to start your app:\n% cd ${name}\n${install ? "" : "% bun install\n"}% cp .env.example .env\n\nConfigure .env using README.md, then run:\n${isPostgres(selection.database) ? "% bun run db:up\n" : ""}% bun run db:migrate\n% bun run dev`,
+			`Your Mystack app is ready in '${name}'.\n\nUse the following commands to start your app:\n% cd ${name}\n${install ? "" : "% bun install\n"}% cp .env.example .env\n\nConfigure .env using README.md, then run:\n${isPostgres(validated.database) ? "% bun run db:up\n" : ""}% bun run db:migrate\n% bun run dev`,
 		);
 		return 0;
 	} catch (error) {
@@ -282,7 +288,7 @@ export async function main(args = process.argv.slice(2)) {
 			cancel("Operation cancelled.");
 			return 130;
 		}
-		log.error(error.message);
+		log.error(error instanceof Error ? error.message : String(error));
 		return 1;
 	}
 }

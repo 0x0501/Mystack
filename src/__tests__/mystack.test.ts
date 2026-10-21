@@ -20,12 +20,13 @@ import {
 	incompatibilities,
 	isPostgres,
 	validateSelection,
-} from "../../packages/mystack/src/catalog.mjs";
-import { installDependencies } from "../../packages/mystack/src/cli.mjs";
+} from "../../packages/mystack/src/catalog.ts";
+import { installDependencies } from "../../packages/mystack/src/cli.ts";
 import {
 	createProject,
 	renderProject,
-} from "../../packages/mystack/src/generate.mjs";
+} from "../../packages/mystack/src/generate.ts";
+import { text } from "../../packages/mystack/src/template.ts";
 
 const templateRoot = fileURLToPath(new URL("../../", import.meta.url));
 const base = {
@@ -38,7 +39,7 @@ const base = {
 test("CLI rejects invalid flags and non-terminal input with actionable feedback before writing", async () => {
 	const cwd = await mkdtemp(join(tmpdir(), "mystack-cli-feedback-"));
 	const cli = fileURLToPath(
-		new URL("../../packages/mystack/src/cli.mjs", import.meta.url),
+		new URL("../../packages/mystack/src/cli.ts", import.meta.url),
 	);
 	try {
 		for (const [args, message] of [
@@ -51,8 +52,8 @@ test("CLI rejects invalid flags and non-terminal input with actionable feedback 
 		] as const) {
 			await assert.rejects(
 				promisify(execFile)(
-					process.execPath,
-					[cli, "create", "test-app", ...args],
+					"bun",
+					["run", cli, "create", "test-app", ...args],
 					{ cwd },
 				),
 				(error: Error & { code?: number; stdout?: string }) => {
@@ -127,7 +128,7 @@ test("supported combinations emit the selected runtimes, dependencies and paymen
 						selection,
 						templateRoot,
 					});
-					const pkg = JSON.parse(files.get("package.json").toString());
+					const pkg = JSON.parse(text(files, "package.json"));
 					assert.equal(pkg.name, "test-app");
 					assert.equal(
 						files.has("wrangler.jsonc"),
@@ -154,10 +155,7 @@ test("supported combinations emit the selected runtimes, dependencies and paymen
 								);
 					}
 					if (database === "d1") {
-						assert.match(
-							files.get("wrangler.jsonc").toString(),
-							/d1_databases/,
-						);
+						assert.match(text(files, "wrangler.jsonc"), /d1_databases/);
 					}
 					assert.ok(
 						files.has("drizzle/0000_thin_phalanx.sql") || isPostgres(database),

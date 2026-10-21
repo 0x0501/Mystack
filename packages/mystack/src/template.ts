@@ -1,5 +1,7 @@
+import type { Stats } from "node:fs";
 import { readdir, readFile } from "node:fs/promises";
 import { join } from "node:path";
+import type { ProjectFiles } from "./types.ts";
 
 // An allowlist prevents credentials, Git history, installed dependencies and
 // local build output from entering the published template.
@@ -31,9 +33,9 @@ export const templateEntries = [
 	"LICENSE",
 ];
 
-export async function readTemplate(root, { packaged = false } = {}) {
-	const files = new Map();
-	async function visit(path) {
+export async function readTemplate(root: string, { packaged = false } = {}) {
+	const files: ProjectFiles = new Map();
+	async function visit(path: string) {
 		if (
 			path === "src/paraglide" ||
 			path.startsWith("scripts/mystack") ||
@@ -48,11 +50,17 @@ export async function readTemplate(root, { packaged = false } = {}) {
 			packaged && path === ".gitignore" ? "gitignore" : path,
 		);
 		const { lstat } = await import("node:fs/promises");
-		let entry;
+		let entry: Stats;
 		try {
 			entry = await lstat(absolute);
 		} catch (error) {
-			if (error.code === "ENOENT" && templateEntries.includes(path)) return;
+			if (
+				error instanceof Error &&
+				"code" in error &&
+				error.code === "ENOENT" &&
+				templateEntries.includes(path)
+			)
+				return;
 			throw error;
 		}
 		if (entry.isSymbolicLink())
@@ -81,12 +89,18 @@ export async function readTemplate(root, { packaged = false } = {}) {
 	return files;
 }
 
-export function text(files, path) {
-	if (!files.has(path)) throw new Error(`Template is missing ${path}.`);
-	return files.get(path).toString("utf8");
+export function text(files: ProjectFiles, path: string) {
+	const contents = files.get(path);
+	if (contents === undefined) throw new Error(`Template is missing ${path}.`);
+	return contents.toString("utf8");
 }
 
-export function replace(files, path, before, after) {
+export function replace(
+	files: ProjectFiles,
+	path: string,
+	before: string,
+	after: string,
+) {
 	const source = text(files, path);
 	if (!source.includes(before))
 		throw new Error(

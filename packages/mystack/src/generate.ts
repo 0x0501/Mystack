@@ -12,14 +12,24 @@ import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { promisify } from "node:util";
 import { Generator, getConfig } from "@tanstack/router-generator";
-import { configureDatabase } from "./adapters/database.mjs";
-import { configureDeployment } from "./adapters/deployment.mjs";
-import { configureEmail } from "./adapters/email.mjs";
-import { configurePayments } from "./adapters/payments.mjs";
-import { catalog, isPostgres, validateSelection } from "./catalog.mjs";
-import { readTemplate, text } from "./template.mjs";
+import { configureDatabase } from "./adapters/database.ts";
+import { configureDeployment } from "./adapters/deployment.ts";
+import { configureEmail } from "./adapters/email.ts";
+import { configurePayments } from "./adapters/payments.ts";
+import {
+	type Category,
+	catalog,
+	isPostgres,
+	validateSelection,
+} from "./catalog.ts";
+import { readTemplate, text } from "./template.ts";
+import type {
+	GenerationContext,
+	ProjectOptions,
+	ProjectPackage,
+} from "./types.ts";
 
-export function validateName(name) {
+export function validateName(name: string) {
 	if (!/^[a-z][a-z0-9-]{0,57}$/.test(name))
 		throw new Error(
 			"Project name must start with a lowercase letter and contain at most 58 lowercase letters, digits or hyphens.",
@@ -35,13 +45,13 @@ export async function renderProject({
 	name,
 	selection,
 	templateRoot = bundledTemplateRoot,
-}) {
+}: ProjectOptions) {
 	validateName(name);
 	validateSelection(selection);
 	const files = await readTemplate(templateRoot, {
 		packaged: templateRoot === bundledTemplateRoot,
 	});
-	const pkg = JSON.parse(text(files, "package.json"));
+	const pkg: ProjectPackage = JSON.parse(text(files, "package.json"));
 	pkg.name = name;
 	delete pkg.pnpm;
 	for (const key of ["mystack", "cli:prepare", "test:cli"])
@@ -73,14 +83,14 @@ export async function createProject({
 	cwd = process.cwd(),
 	templateRoot = bundledTemplateRoot,
 	onProgress = () => {},
-}) {
+}: ProjectOptions & { cwd?: string; onProgress?: (message: string) => void }) {
 	validateName(name);
 	validateSelection(selection);
 	const target = resolve(cwd, name);
 	// Reserve a new directory exclusively. Never overwrite even an empty existing
 	// directory, and never remove user files if installation later fails.
 	await mkdir(target);
-	let staging;
+	let staging: string | undefined;
 	try {
 		staging = await mkdtemp(join(cwd, ".mystack-"));
 		onProgress("Creating project files...");
@@ -120,10 +130,10 @@ export async function createProject({
 	}
 }
 
-function projectReadme({ name, selection }) {
-	const label = (category, id) =>
-		catalog[category].find((option) => option.id === id).label;
-	const databaseNotes = {
+function projectReadme({ name, selection }: GenerationContext) {
+	const label = (category: Category, id: string) =>
+		catalog[category].find((option) => option.id === id)?.label;
+	const databaseNotes: Record<string, string> = {
 		pg: "PostgreSQL connects directly through DATABASE_URL using the application role. DATABASE_MIGRATION_URL is privileged and is only for migrations. Use Docker for local development.",
 		"pg-hyperdrive":
 			"PostgreSQL connects through the Cloudflare HYPERDRIVE binding. Local development uses hyperdrive.localConnectionString in wrangler.jsonc; production requires your Hyperdrive configuration ID. DATABASE_MIGRATION_URL is only for migrations.",
