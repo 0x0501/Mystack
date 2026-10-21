@@ -47,16 +47,16 @@ Enter the generated directory, copy `.env.example` to `.env`, and configure the 
 
 Contributors use the repository's [maintainer guide](../../docs/contributing.md) for local CLI development, schema generation, tests and release packaging. The root application is the single runnable template source; `template/` is an ignored release snapshot and `assets/` contains alternate files and database fixtures. See [ADR 0012](../../docs/adr/0012-mystack-project-generation.md).
 
-The tarball contains the snapshot and adapters, and works outside the checkout without fetching a moving Git branch. `prepack` refreshes the snapshot from an explicit allowlist; secrets, Git history, dependencies, and local build output are excluded. Tagged releases publish through GitHub Actions using npm trusted publishing; see the repository's [publishing guide](../../docs/publishing.md) for account setup.
+The tarball contains the snapshot, compiled CLI and adapters, and works outside the checkout without fetching a moving Git branch. Maintained code and scripts use TypeScript. `prepack` compiles `src/` to `dist/` for Node and refreshes the snapshot from an explicit allowlist; secrets, Git history, dependencies, and application build output are excluded. Tagged releases publish through GitHub Actions using npm trusted publishing; see the repository's [publishing guide](../../docs/publishing.md) for account setup.
 
 ## Extend
 
-`src/catalog.mjs` defines option IDs, labels, and compatibility requirements. Both the wizard and noninteractive validation consume it. Category adapters in `src/adapters/` produce source, dependencies, scripts, environment declarations and resource configuration. Add an option to its catalog and implement it in the category adapter. Payment API definitions live in the payment adapter. Add tests for new option combinations before exposing them. Template edits use checked anchors and fail explicitly when the underlying starter changes.
+`src/catalog.ts` defines option IDs, labels, and compatibility requirements. Both the wizard and noninteractive validation consume it. Category adapters in `src/adapters/` produce source, dependencies, scripts, environment declarations and resource configuration. Add an option to its catalog and implement it in the category adapter. Payment API definitions live in the payment adapter. Add tests for new option combinations before exposing them. Template edits use checked anchors and fail explicitly when the underlying starter changes.
 
 SQLite auth schema is generated from the starter's actual auth config:
 
 ```sh
-node packages/mystack/scripts/generate-auth-schema.mjs
+bun packages/mystack/scripts/generate-auth-schema.ts
 bun x drizzle-kit generate --config packages/mystack/assets/drizzle.config.ts
 ```
 

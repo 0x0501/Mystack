@@ -1,8 +1,22 @@
 import { readFile } from "node:fs/promises";
-import { catalog, isPostgres } from "../catalog.mjs";
-import { replace, text } from "../template.mjs";
+import { catalog, isPostgres } from "../catalog.ts";
+import { replace, text } from "../template.ts";
+import type { GenerationContext } from "../types.ts";
 
-const definitions = {
+interface PaymentDefinition {
+	required: string;
+	functionName: string;
+	envKeys: string[];
+	checkoutAsset?: string;
+	testAsset?: string;
+	webhookAsset?: string;
+	routeAsset?: string;
+	dependencies?: Record<string, string>;
+	envSchema?: string;
+	envExample?: string;
+}
+
+const definitions: Record<string, PaymentDefinition> = {
 	stripe: {
 		required: "env.STRIPE_SECRET_KEY",
 		functionName: "createStripeSession",
@@ -48,7 +62,11 @@ const definitions = {
 	},
 };
 
-export async function configurePayments({ files, pkg, selection }) {
+export async function configurePayments({
+	files,
+	pkg,
+	selection,
+}: GenerationContext) {
 	const ids = selection.payments;
 	const allIds = catalog.payments.map((option) => option.id);
 	const original = text(files, "src/services/payment-providers.ts");

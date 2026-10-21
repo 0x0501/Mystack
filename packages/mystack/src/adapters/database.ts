@@ -1,10 +1,11 @@
 import { readFile } from "node:fs/promises";
 import { join, relative } from "node:path";
 import { fileURLToPath } from "node:url";
-import { isPostgres } from "../catalog.mjs";
-import { replace, text } from "../template.mjs";
+import { isPostgres } from "../catalog.ts";
+import { replace, text } from "../template.ts";
+import type { GenerationContext } from "../types.ts";
 
-export async function configureDatabase(context) {
+export async function configureDatabase(context: GenerationContext) {
 	const { files, selection, pkg } = context;
 	// Schema generation must not instantiate an empty auth adapter at app startup.
 	replace(
@@ -26,13 +27,13 @@ export async function configureDatabase(context) {
 		"inferAdditionalFields<Auth>()",
 	);
 	files.set(
-		"scripts/generate-auth-schema.mjs",
+		"scripts/generate-auth-schema.ts",
 		await readFile(
-			new URL("../../assets/generate-auth-schema.mjs", import.meta.url),
+			new URL("../../assets/generate-auth-schema.ts", import.meta.url),
 		),
 	);
 	pkg.scripts["auth:generate"] =
-		"bun run paraglide:compile && bun scripts/generate-auth-schema.mjs";
+		"bun run paraglide:compile && bun scripts/generate-auth-schema.ts";
 	if (isPostgres(selection.database)) {
 		if (selection.database === "pg") {
 			files.set(
@@ -276,7 +277,7 @@ export default defineConfig({ out: "./drizzle", schema: "./src/db/schema.ts", di
 	}
 }
 
-async function configureTurso({ files, pkg, selection }) {
+async function configureTurso({ files, pkg, selection }: GenerationContext) {
 	const cloud = selection.database === "turso-cloud";
 	const worker = selection.deployment === "cloudflare";
 	const localUrl = worker
@@ -418,7 +419,7 @@ process.exit(child.status ?? 1);
 	);
 }
 
-async function configureBunSQLite({ files, pkg }) {
+async function configureBunSQLite({ files, pkg }: GenerationContext) {
 	pkg.scripts.dev = "bun --bun vite dev --port 3000";
 	files.set(
 		"src/db/index.ts",

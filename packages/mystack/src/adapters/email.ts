@@ -1,6 +1,7 @@
-import { replace, text } from "../template.mjs";
+import { replace, text } from "../template.ts";
+import type { GenerationContext } from "../types.ts";
 
-export async function configureEmail({ files, selection }) {
+export async function configureEmail({ files, selection }: GenerationContext) {
 	const original = text(files, "src/lib/email.tsx");
 	const start = original.indexOf("type EmailBinding =");
 	const end = original.indexOf("/**\n * The recipient's own language");

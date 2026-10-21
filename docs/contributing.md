@@ -4,9 +4,11 @@ This guide is for contributors to the generator. Application users install a CLI
 
 ## Sources and generated files
 
-The repository root is the only canonical, runnable reference application: PostgreSQL + Hyperdrive, Workers and Cloudflare Email. Edit its source and test it there. `packages/mystack/src/catalog.mjs` defines the choices and compatibility rules shared by prompts and flags. Category adapters in `src/adapters/` modify the in-memory file map and package metadata; `assets/` holds alternative complete source files, schemas, migrations and test harnesses.
+The repository root is the only canonical, runnable reference application: PostgreSQL + Hyperdrive, Workers and Cloudflare Email. Edit its source and test it there. `packages/mystack/src/catalog.ts` defines the choices and compatibility rules shared by prompts and flags. Category adapters in `src/adapters/` modify the in-memory file map and package metadata; `assets/` holds alternative complete source files, schemas, migrations and test harnesses.
 
 `packages/mystack/template/` is a release artifact, ignored by Git. `template:prepare` copies an explicit allowlist from the root, and `prepack` refreshes it before packaging. Edit the root source, never the snapshot. Real environment files, Git history, installed dependencies and build output are excluded. `docs/project-guide.md` is the shared application guide shipped with generated projects; repository tutorials and research stay here.
+
+Maintain CLI code and scripts in TypeScript; do not add `.mjs` source files. Local commands run the `.ts` source with Bun. `bun run --cwd packages/mystack build` compiles the CLI to `dist/*.js`, rewriting relative TypeScript imports for Node. `prepack` builds this output before preparing the template; the npm executable is `dist/cli.js`.
 
 There is no separate `examples/` or second full application under `templates/`. [ADR 0012](./adr/0012-mystack-project-generation.md) records why and when that decision should be revisited.
 
@@ -30,7 +32,7 @@ A new directory alone does not remove fragile source replacement. Do not introdu
 Better Auth schemas are generated. After changing root auth plugins/fields, run `bun run auth:generate`, `bun run db:generate` and the relevant migration checks. Update the alternate SQLite schema and migrations through their generators:
 
 ```sh
-node packages/mystack/scripts/generate-auth-schema.mjs
+bun packages/mystack/scripts/generate-auth-schema.ts
 bun x drizzle-kit generate --config packages/mystack/assets/drizzle.config.ts
 ```
 

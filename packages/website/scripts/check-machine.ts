@@ -1,6 +1,6 @@
 import { createHash } from "node:crypto";
 import { readFileSync } from "node:fs";
-import { catalog } from "../../mystack/src/catalog.mjs";
+import { catalog } from "../../mystack/src/catalog.ts";
 import model from "../src/data/machine.json";
 import type { AssemblyModule } from "../src/services/assembly";
 

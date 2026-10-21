@@ -2,7 +2,7 @@ import {
 	catalog,
 	defaults,
 	incompatibilities,
-} from "../../mystack/src/catalog.mjs";
+} from "../../mystack/src/catalog.ts";
 
 export type Category = "deployment" | "database" | "email" | "payments";
 export type Selection = {

@@ -120,6 +120,7 @@ Both pages use a pass-through `validateSearch` so the signed query stays in the 
 - Default styles live in `src/styles/{theme,layout,ui}.css`; presentation rules use CSS layers so utility classes can override them. Do not add pass-through component wrappers to restyle Base UI.
 
 - Biome, **tabs**, double quotes. Run `bun run check` and `bun run typecheck` before finishing.
+- Write maintained code and scripts in TypeScript (`.ts` / `.tsx`); do not add `.mjs` source files. Compile the CLI to JavaScript for npm distribution.
 - Path aliases: `@/*` and `#/*` both map to `src/*`.
 - **State-changing server functions declare `method: "POST"`** and validate their input — `check:server-fns` fails the build otherwise. Pure reads stay on GET so loaders keep prefetching.
 - **No `sql.raw`** in `src/` — `check:sql-raw` forbids it. A raw interpolation on the app connection can `set_config` the `app.service` GUC and escalate past RLS. Static constants need an auditable `sql-raw-ok` annotation.

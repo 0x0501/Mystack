@@ -1,6 +1,12 @@
-import { replace, text } from "../template.mjs";
+import { replace, text } from "../template.ts";
+import type { GenerationContext } from "../types.ts";
 
-export async function configureDeployment({ files, pkg, selection, name }) {
+export async function configureDeployment({
+	files,
+	pkg,
+	selection,
+	name,
+}: GenerationContext) {
 	if (selection.deployment === "cloudflare") {
 		replace(files, "wrangler.jsonc", '"name": "mystack"', `"name": "${name}"`);
 		pkg.scripts["cf:typegen"] = "wrangler types";
